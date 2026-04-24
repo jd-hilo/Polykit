@@ -19,15 +19,6 @@ const FEATURES: Feature[] = [
     right: { h: "Get confidence scores, risks & exit plans", d: "Every analysis includes a confidence rating, edge calculation, key risks, and a full exit strategy — so you always know exactly when to enter and when to walk away.", cta: "Try the Analyzer", href: "/dashboard/ai-analyzer" },
   },
   {
-    id: "picks",
-    bg: "bg-[#dcfce7]", border: "border-[#86efac]",
-    head: "text-[#14532d]", sub: "text-[#14532d]/80", body: "text-[#14532d]/75", btnTone: "btn-feature-green",
-    title: <>Daily picks from traders who actually win.</>,
-    sub2: <>Curated bets handpicked by top traders — so you can skip the noise and <em>bet with confidence.</em></>,
-    left: { h: "Expert-curated bets, updated daily", d: "Our team reviews hundreds of markets every day and surfaces only the highest-conviction plays. No guesswork — just proven picks backed by real analysis.", cta: "See Today's Picks", href: "/dashboard/picks" },
-    right: { h: "Know exactly what to bet and when", d: "Every pick comes with a clear recommendation, entry price, and reasoning — so you can place your bet in seconds and move on with your day.", cta: "See Today's Picks", href: "/dashboard/picks" },
-  },
-  {
     id: "copy",
     bg: "bg-[#fce7f3]", border: "border-[#f9a8d4]",
     head: "text-[#831843]", sub: "text-[#831843]/80", body: "text-[#831843]/75", btnTone: "btn-feature-pink",
@@ -46,6 +37,75 @@ const FEATURES: Feature[] = [
     right: { h: "Track your performance", d: "See your full trade history, monitor open positions in real time, and measure your edge before going live with real money.", cta: "View Positions", href: "/dashboard/positions" },
   },
 ];
+
+function TradeStrategiesCard() {
+  return (
+    <div
+      className="relative w-full overflow-hidden bg-white"
+      style={{
+        borderRadius: 24,
+        border: "2px solid rgba(76,178,255,0.6)",
+        boxShadow: "rgba(0,0,0,0.06) 0px 2px 8px 0px, rgba(35,90,233,0.08) 0px 0px 25px 0px inset",
+      }}
+    >
+      {/* Tinted top strip with dot pattern */}
+      <div className="relative" style={{ height: 96, background: "linear-gradient(180deg, #ede9fe 0%, #ffffff 100%)" }}>
+        <div
+          aria-hidden
+          className="absolute inset-0"
+          style={{
+            backgroundImage: "radial-gradient(circle, rgba(100,116,139,0.25) 1px, transparent 1px)",
+            backgroundSize: "12px 12px",
+            WebkitMaskImage: "linear-gradient(180deg, black 0%, transparent 100%)",
+            maskImage: "linear-gradient(180deg, black 0%, transparent 100%)",
+          }}
+        />
+      </div>
+
+      {/* Icon centered on strip boundary */}
+      <div className="relative -mt-6 flex justify-center">
+        <div
+          className="flex items-center justify-center rounded-2xl shadow-sm overflow-hidden"
+          style={{ width: 48, height: 48, backgroundColor: "rgba(139,92,246,0.15)", border: "1px solid rgba(255,255,255,0.7)" }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.png" alt="Polykit" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+        </div>
+      </div>
+
+      {/* Text + CTA */}
+      <div className="px-8 pb-8 pt-4 text-center">
+        <div className="flex items-center justify-center gap-2 mb-2">
+          <span style={{ fontSize: 22, fontWeight: 800, letterSpacing: "-0.02em", color: "rgb(20,24,31)" }}>
+            Trade Strategies
+          </span>
+          <span style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em", color: "rgb(109,40,217)", padding: "2px 8px", borderRadius: 99, backgroundColor: "rgba(139,92,246,0.12)", border: "1px solid rgba(139,92,246,0.3)" }}>
+            Coming Soon
+          </span>
+        </div>
+        <p className="mx-auto mt-1 max-w-xl text-muted-foreground" style={{ fontSize: 15, lineHeight: "22px" }}>
+          Copy expert strategies built by top Polymarket traders and let the system execute them automatically — zero manual work required.
+        </p>
+
+        <div className="mx-auto mt-8 grid max-w-2xl gap-6 text-left md:grid-cols-2">
+          {[
+            { h: "Plug-and-play strategies", d: "Browse strategies ranked by ROI, win rate, and risk. Activate in one click." },
+            { h: "Set it and forget it", d: "The system monitors markets 24/7 and places trades sized to your budget." },
+          ].map((c, i) => (
+            <div key={i} className="rounded-2xl border border-gray-100 bg-gray-50 p-5">
+              <div style={{ fontSize: 15, fontWeight: 700, color: "rgb(20,24,31)", marginBottom: 6 }}>{c.h}</div>
+              <p style={{ fontSize: 13, lineHeight: "19px", color: "rgb(107,114,128)" }}>{c.d}</p>
+            </div>
+          ))}
+        </div>
+
+        <a href="#pricing" className="btn-primary btn-primary-sm mt-6 inline-flex">
+          Join Waitlist →
+        </a>
+      </div>
+    </div>
+  );
+}
 
 export function FeatureCards() {
   return (
@@ -67,6 +127,7 @@ export function FeatureCards() {
           </div>
         </div>
       ))}
+      <TradeStrategiesCard />
     </section>
   );
 }

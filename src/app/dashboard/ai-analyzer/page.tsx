@@ -11,7 +11,7 @@ import {
   Image as ImageIcon,
   AlertTriangle,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/auth/AuthProvider";
 import type {
@@ -69,7 +69,15 @@ function cycleEffort(e: Effort): Effort {
   return "low";
 }
 
-export default function AIAnalyzer() {
+export default function AIAnalyzerPage() {
+  return (
+    <Suspense fallback={<div />}>
+      <AIAnalyzer />
+    </Suspense>
+  );
+}
+
+function AIAnalyzer() {
   const { hasAccess, openGate } = useAuth();
   const searchParams = useSearchParams();
   const [mode, setMode] = useState<Mode>("screenshot");
