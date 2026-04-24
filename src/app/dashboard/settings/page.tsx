@@ -130,6 +130,7 @@ export default function SettingsPage() {
           <div style={{ padding: "0 18px 14px" }}>
             <button
               onClick={async () => {
+                if (typeof window !== "undefined") localStorage.setItem("ps_checkout_started", "1");
                 const res = await fetch("/api/stripe/checkout", {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },

@@ -109,6 +109,51 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  // Whop checkout: detect "came back from checkout without upgrading".
+  // We set `ps_checkout_started=1` before redirecting to Whop. When the user
+  // returns (bfcache restore, back button, tab refocus) still without access,
+  // show the return paywall modal.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    function checkReturnFromCheckout() {
+      if (localStorage.getItem("ps_checkout_started") !== "1") return;
+      // Let the subscription refetch win if they actually upgraded.
+      if (hasAccess) {
+        localStorage.removeItem("ps_checkout_started");
+        return;
+      }
+      localStorage.removeItem("ps_checkout_started");
+      // Re-check subscription — if still no access after a moment, show modal.
+      fetch("/api/subscription/status", { cache: "no-store" })
+        .then((r) => r.json())
+        .then((d: { hasAccess?: boolean }) => {
+          if (d.hasAccess === true) {
+            setHasAccess(true);
+          } else {
+            setReturnOpen(true);
+          }
+        })
+        .catch(() => setReturnOpen(true));
+    }
+
+    // Fires on bfcache restore (back button from Whop on mobile/desktop).
+    const onPageShow = (e: PageTransitionEvent) => {
+      if (e.persisted) checkReturnFromCheckout();
+    };
+    // Fires when the tab regains focus (desktop: user closes Whop tab / clicks back).
+    const onVisibility = () => {
+      if (document.visibilityState === "visible") checkReturnFromCheckout();
+    };
+
+    window.addEventListener("pageshow", onPageShow);
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      window.removeEventListener("pageshow", onPageShow);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
+  }, [hasAccess]);
+
   const openAuth = useCallback(() => {
     if (user) {
       if (typeof window !== "undefined") window.location.href = "/dashboard";
