@@ -1,0 +1,83 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Subscription {
+  userId              String   @id @map("user_id")
+  stripeCustomerId    String?  @map("stripe_customer_id")
+  stripeSubscriptionId String? @map("stripe_subscription_id")
+  status              String?
+  currentPeriodEnd    DateTime? @map("current_period_end") @db.Timestamptz
+  updatedAt           DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+  @@map("subscriptions")
+}
+
+model Position {
+  id             String   @id @default(uuid()) @db.Uuid
+  userId         String   @map("user_id")
+  marketQuestion String   @map("market_question")
+  marketSlug     String?  @map("market_slug")
+  eventSlug      String?  @map("event_slug")
+  side           String   // YES or NO
+  entryPrice     Decimal  @map("entry_price") @db.Decimal
+  exitPrice      Decimal? @map("exit_price") @db.Decimal
+  size           Decimal  @db.Decimal
+  status         String   @default("open") // open | closed
+  pnl            Decimal  @default(0) @db.Decimal
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+  closedAt       DateTime? @map("closed_at") @db.Timestamptz
+  @@index([userId, status])
+  @@map("positions")
+}
+
+model WaitlistEntry {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id")
+  email     String
+  feature   String
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  @@map("waitlist_entries")
+}
+
+model TrackedWallet {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id")
+  address   String
+  label     String?
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  @@unique([userId, address])
+  @@map("tracked_wallets")
+}
+
+model Pick {
+  id             String   @id @default(uuid()) @db.Uuid
+  marketQuestion String   @map("market_question")
+  slug           String?
+  eventSlug      String?  @map("event_slug")
+  side           String?
+  price          Decimal? @db.Decimal
+  confidence     Int?
+  rationale      String?
+  imageUrl       String?  @map("image_url")
+  volumeUsd      Decimal? @map("volume_usd") @db.Decimal
+  liquidityUsd   Decimal? @map("liquidity_usd") @db.Decimal
+  endsAt         DateTime? @map("ends_at") @db.Timestamptz
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+  @@map("picks")
+}
+
+model CoachMessage {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id")
+  role      String   // user | assistant
+  content   String
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  @@index([userId, createdAt])
+  @@map("coach_messages")
+}

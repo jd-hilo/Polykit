@@ -1,0 +1,110 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 0 0% 100%;
+  --foreground: 220 20% 10%;
+  --card: 0 0% 100%;
+  --border: 220 13% 91%;
+  --input: 220 13% 91%;
+  --primary: 221 83% 53%;
+  --primary-foreground: 0 0% 100%;
+  --muted: 220 14% 96%;
+  --muted-foreground: 220 10% 50%;
+  --accent: 220 14% 96%;
+  --destructive: 0 72% 55%;
+  --money-green: 142 71% 45%;
+  --premium-bg: 203 100% 92%;
+  --premium-border: 206 100% 65%;
+  --premium-pink-bg: 330 80% 93%;
+  --premium-pink-border: 330 70% 60%;
+}
+
+html, body { background: hsl(var(--background)); color: hsl(var(--foreground)); }
+body { font-family: 'Open Sauce One', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; -webkit-font-smoothing: antialiased; }
+
+/* Polykit blue pill button — rounded 14px, 1px blue ring + inset highlight + subtle gradient */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  position: relative;
+  overflow: hidden;
+  padding: 10px 24px;
+  border-radius: 14px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: #fff;
+  background-color: #2463eb;
+  background-image: linear-gradient(0deg, rgba(28, 70, 177, 0.25), rgba(238, 244, 252, 0) 50%);
+  box-shadow:
+    #2463eb 0 0 0 1px,
+    rgba(235, 244, 255, 0.3) 0 -1px 8px 2px inset;
+  transition: filter 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+.btn-primary:hover { filter: brightness(1.1); }
+.btn-primary-lg { padding: 16px 40px; font-size: 18px; line-height: 28px; }
+.btn-primary-md { padding: 14px 26px; font-size: 16px; line-height: 24px; }
+.btn-primary-sm { padding: 10px 26px; font-size: 14px; line-height: 20px; }
+
+/* Hero white CTA — rounded 14px, white bg with subtle blue gradient, blue text + ring */
+.btn-hero {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 40px;
+  border-radius: 14px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: #235ae9;
+  background-color: #fff;
+  background-image: linear-gradient(360deg, rgba(35, 90, 233, 0.15), rgba(238, 244, 252, 0) 76%, rgba(75, 120, 237, 0));
+  border: 1px solid #fff;
+  box-shadow:
+    rgba(6, 35, 84, 0.3) 0 2px 8px 0,
+    #235ae9 0 0 0 0.5px,
+    rgba(235, 244, 255, 0.5) 0 -1px 8px 2px inset;
+  transition: filter 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+.btn-hero:hover { filter: brightness(1.05); }
+
+/* Feature-card white pill — rounded 12px, tinted border per card tone */
+.btn-feature {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 12px;
+  background: #fff;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 20px;
+  border: 1px solid transparent;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+}
+.btn-feature:hover { box-shadow: 0 4px 10px rgba(0,0,0,0.07); }
+.btn-feature-blue  { color: #00495c; border-color: #c3f0f9; }
+.btn-feature-green { color: #144607; border-color: #d0f6a2; }
+.btn-feature-pink  { color: #570f33; border-color: #fad1e6; }
+.btn-feature-amber { color: #532e09; border-color: #ffe9b3; }
+
+.card-premium {
+  @apply rounded-3xl border-2 bg-white p-8 md:p-10;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 10px 30px -12px rgba(0,0,0,0.08);
+}
+
+.glass-pill {
+  @apply inline-flex items-center gap-2 rounded-full border border-border bg-white/70 px-3 py-1 text-xs font-medium backdrop-blur;
+}
+
+.blur-lock { filter: blur(8px); user-select: none; pointer-events: none; }
+
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { scrollbar-width: none; }
