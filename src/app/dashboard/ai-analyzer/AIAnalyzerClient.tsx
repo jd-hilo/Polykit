@@ -11,8 +11,7 @@ import {
   Image as ImageIcon,
   AlertTriangle,
 } from "lucide-react";
-import { Suspense, useEffect, useRef, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
 import type {
   AnalyzerResponse,
@@ -70,16 +69,7 @@ function cycleEffort(e: Effort): Effort {
 }
 
 export default function AIAnalyzerClient() {
-  return (
-    <Suspense fallback={<div />}>
-      <AIAnalyzer />
-    </Suspense>
-  );
-}
-
-function AIAnalyzer() {
   const { hasAccess, openGate } = useAuth();
-  const searchParams = useSearchParams();
   const [mode, setMode] = useState<Mode>("screenshot");
   const [effort, setEffort] = useState<Effort>("medium");
   const autoRanRef = useRef(false);
@@ -129,8 +119,10 @@ function AIAnalyzer() {
   // If `auto=1` is present, kick off analysis as soon as the URL is in state.
   useEffect(() => {
     if (autoRanRef.current) return;
-    const slug = searchParams?.get("slug");
-    const urlParam = searchParams?.get("url");
+    if (typeof window === "undefined") return;
+    const sp = new URLSearchParams(window.location.search);
+    const slug = sp.get("slug");
+    const urlParam = sp.get("url");
     const incoming = slug
       ? `https://polymarket.com/event/${slug}`
       : urlParam || null;
@@ -138,7 +130,7 @@ function AIAnalyzer() {
     setMode("link");
     setUrl(incoming);
     autoRanRef.current = true;
-    if (searchParams?.get("auto") === "1") {
+    if (sp.get("auto") === "1") {
       setAutoPending(true);
     }
     // Intentionally only run once on mount.
