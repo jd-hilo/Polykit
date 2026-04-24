@@ -43,13 +43,12 @@ export function PricingCard() {
           </div>
           <p className="mt-3 text-sm text-muted-foreground">You&apos;re getting instant access to the complete Polykit platform.</p>
           <div className="mt-5 flex items-end gap-3">
-            <span className="text-3xl font-semibold text-foreground/80">Just</span>
-            <span className="text-3xl font-semibold text-muted-foreground line-through">$56</span>
-            <span className="text-4xl font-extrabold">$39</span>
-            <span className="mb-1 rounded-full bg-[#dcfce7] px-2 py-0.5 text-xs font-semibold text-[#166534]">-30%</span>
+            <span className="text-4xl font-extrabold">$1</span>
+            <span className="text-2xl font-semibold text-muted-foreground">first month</span>
+            <span className="mb-1 rounded-full bg-[#dcfce7] px-2 py-0.5 text-xs font-semibold text-[#166534]">then $39/mo</span>
           </div>
           <button onClick={openAuth} className="btn-primary btn-primary-md mt-6 w-full">
-            Try Polykit for $39 <span>→</span>
+            Start for $1 <span>→</span>
           </button>
           <div className="mt-5 flex items-center justify-center gap-3 text-xs">
             <TrustpilotStars /> <span className="font-medium">4.9/5</span>

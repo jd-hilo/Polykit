@@ -10,7 +10,7 @@ const ITEMS = [
   { q: "How fast is the analysis?", a: "Under 8 seconds from screenshot upload to full verdict with confidence score, edge calc, and exit plan." },
   { q: "Do I need experience with prediction markets?", a: "No. Polykit explains each pick in plain English and walks you through every step." },
   { q: "Is my money safe?", a: "Polykit never touches your money or wallet. You execute trades yourself on your preferred platform." },
-  { q: "How much does it cost?", a: "$39/month with 30% off. Includes everything — unlimited AI analysis, daily picks, copy trading, and more." },
+  { q: "How much does it cost?", a: "$1 for your first month, then $39/month. Includes everything — unlimited AI analysis, daily picks, copy trading, and more." },
   { q: "How can I cancel my subscription?", a: "Two clicks in your dashboard. No phone calls, no retention emails, no hassle." },
 ];
 

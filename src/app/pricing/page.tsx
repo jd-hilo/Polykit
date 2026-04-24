@@ -9,9 +9,9 @@ import { FAQ } from "@/components/home/FAQ";
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://polykit.io";
 
 export const metadata: Metadata = {
-  title: "Pricing — Polykit | $39/mo AI for Polymarket & Kalshi",
+  title: "Pricing — Polykit | Start for $1 — AI for Polymarket & Kalshi",
   description:
-    "Simple pricing. One plan. All-access. $39/month with 30% off — unlimited AI analysis, daily picks, copy trading, paper trading, and wallet tracking for Polymarket and Kalshi.",
+    "Simple pricing. One plan. All-access. Start for $1 your first month — unlimited AI analysis, daily picks, copy trading, paper trading, and wallet tracking for Polymarket and Kalshi.",
   keywords: [
     "Polykit pricing",
     "Polymarket AI price",
@@ -24,15 +24,15 @@ export const metadata: Metadata = {
     type: "website",
     url: `${SITE_URL}/pricing`,
     siteName: "Polykit",
-    title: "Polykit Pricing — $39/mo All-Access",
+    title: "Polykit Pricing — Start for $1",
     description:
-      "One plan, all features. Unlimited AI market analysis for Polymarket and Kalshi at $39/month.",
+      "One plan, all features. Start for $1 your first month, then $39/month.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Polykit Pricing — $39/mo All-Access",
+    title: "Polykit Pricing — Start for $1",
     description:
-      "Unlimited AI market analysis for Polymarket and Kalshi at $39/month.",
+      "Start for $1 your first month. Unlimited AI market analysis for Polymarket and Kalshi.",
   },
   alternates: { canonical: `${SITE_URL}/pricing` },
 };
@@ -45,7 +45,7 @@ export default function Pricing() {
       <main className="pb-8 pt-12">
         <div className="mx-auto max-w-3xl px-4 text-center">
           <h1 className="text-4xl font-extrabold tracking-tight md:text-6xl">Simple pricing. One plan. All-access.</h1>
-          <p className="mx-auto mt-4 max-w-xl text-muted-foreground">$39/month with 30% off. Includes unlimited AI analysis, daily picks, copy trading and more.</p>
+          <p className="mx-auto mt-4 max-w-xl text-muted-foreground">Start for $1 your first month, then $39/month. Unlimited AI analysis, daily picks, copy trading and more.</p>
         </div>
         <div className="mt-8"><UrgencyBanner /></div>
         <PricingCard />

@@ -7,6 +7,7 @@ import {
   FlaskConical,
   Wallet,
   MessageCircle,
+  Settings,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useEffect } from "react";
@@ -109,6 +110,23 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
             );
           })}
         </nav>
+
+        {/* Settings icon — pinned to bottom */}
+        <Link
+          href="/dashboard/settings"
+          title="Settings"
+          aria-label="Settings"
+          className="flex items-center justify-center transition-colors duration-200 mb-2"
+          style={{
+            width: 40,
+            height: 40,
+            borderRadius: 10,
+            color: pathname.startsWith("/dashboard/settings") ? "rgb(36,99,235)" : "rgb(156,163,175)",
+            backgroundColor: pathname.startsWith("/dashboard/settings") ? "rgba(36,99,235,0.06)" : "transparent",
+          }}
+        >
+          <Settings size={18} />
+        </Link>
       </aside>
 
       {/* ── Main column (topbar + content) ── */}

@@ -64,10 +64,9 @@ export function PaywallModal({ open, onClose }: { open: boolean; onClose: () => 
 
           {/* Price */}
           <div className="mt-5 flex items-end gap-3">
-            <span className="text-3xl font-semibold text-foreground/80">Just</span>
-            <span className="text-3xl font-semibold text-muted-foreground line-through">$56</span>
-            <span className="text-4xl font-extrabold">$39</span>
-            <span className="mb-1 rounded-full bg-[#dcfce7] px-2 py-0.5 text-xs font-semibold text-[#166534]">-30%</span>
+            <span className="text-4xl font-extrabold">$1</span>
+            <span className="text-2xl font-semibold text-muted-foreground">first month</span>
+            <span className="mb-1 rounded-full bg-[#dcfce7] px-2 py-0.5 text-xs font-semibold text-[#166534]">then $39/mo</span>
           </div>
 
           {/* Countdown */}

@@ -1,26 +1,25 @@
-import { prisma } from "@/lib/prisma";
+import { currentUser } from "@clerk/nextjs/server";
+import { checkWhopAccess } from "./whop";
 
 /**
- * Returns true when the user has an active (or trialing) subscription row.
- * Safe to call without the DB configured — returns false in that case.
+ * Returns true when the user has an active Whop membership.
  */
 export async function isUserSubscribed(userId: string | null | undefined): Promise<boolean> {
   if (!userId) return false;
-  // Dev bypass: treat everyone as subscribed until Stripe is wired up.
-  // Remove this block (or set DEV_UNLOCK_SUBSCRIPTION=0) once Stripe is live.
+
+  // Dev bypass — set DEV_UNLOCK_SUBSCRIPTION=0 to disable
   if (
     process.env.NODE_ENV !== "production" &&
     process.env.DEV_UNLOCK_SUBSCRIPTION !== "0"
   ) {
     return true;
   }
+
   try {
-    const row = await prisma.subscription.findUnique({
-      where: { userId },
-      select: { status: true },
-    });
-    const status = row?.status;
-    return status === "active" || status === "trialing";
+    const user = await currentUser();
+    const email = user?.primaryEmailAddress?.emailAddress;
+    if (!email) return false;
+    return await checkWhopAccess(email);
   } catch {
     return false;
   }

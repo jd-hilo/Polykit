@@ -44,11 +44,11 @@ export function Nav({ transparent = false }: { transparent?: boolean }) {
         </nav>
         {onDark ? (
           <button onClick={openAuth} className="inline-flex items-center rounded-full bg-white/10 px-5 py-2.5 text-sm font-semibold text-white ring-1 ring-white/30 backdrop-blur transition hover:bg-white/20">
-            Try Polykit for $39
+            Start for $1
           </button>
         ) : (
           <button onClick={openAuth} className="btn-primary btn-primary-sm">
-            Try Polykit for $39
+            Start for $1
           </button>
         )}
       </div>
