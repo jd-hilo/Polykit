@@ -22,7 +22,7 @@ export async function isUserSubscribed(userId: string | null | undefined): Promi
     const user = await currentUser();
     const email = user?.primaryEmailAddress?.emailAddress;
     if (!email) return false;
-    return await checkWhopAccess(email);
+    return await checkWhopAccess(email as string);
   } catch {
     return false;
   }
