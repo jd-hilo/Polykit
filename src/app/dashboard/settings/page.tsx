@@ -114,13 +114,13 @@ export default function SettingsPage() {
               icon={CreditCard}
               label="Manage Subscription"
               value="Update card, view invoices"
-              onClick={() => window.open("https://whop.com/manage", "_blank")}
+              onClick={() => window.open("https://whop.com/hub", "_blank")}
             />
             <Row
               icon={LogOut}
               label="Cancel Subscription"
               value="Cancel anytime — no hassle"
-              onClick={() => window.open("https://whop.com/manage", "_blank")}
+              onClick={() => window.open("https://whop.com/hub", "_blank")}
               danger
               chevron={false}
             />
