@@ -9,7 +9,7 @@ export async function checkWhopAccess(email: string): Promise<boolean> {
   try {
     const url = new URL("https://api.whop.com/api/v2/memberships");
     url.searchParams.set("status", "active");
-    url.searchParams.set("per", "10");
+    url.searchParams.set("per", "100");
 
     const res = await fetch(url.toString(), {
       headers: { Authorization: `Bearer ${apiKey}` },
