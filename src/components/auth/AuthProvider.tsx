@@ -1,5 +1,5 @@
 "use client";
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useClerk, useUser } from "@clerk/nextjs";
 import { PaywallModal } from "./PaywallModal";
 import { ReturnPaywallModal } from "./ReturnPaywallModal";
@@ -31,6 +31,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [paywallOpen, setPaywallOpen] = useState(false);
   const [returnOpen, setReturnOpen] = useState(false);
   const [hasAccess, setHasAccess] = useState(false);
+  const justUpgraded = useRef(false);
   const [subscriptionLoaded, setSubscriptionLoaded] = useState(false);
   const [upgradeToastVisible, setUpgradeToastVisible] = useState(false);
 
@@ -55,21 +56,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
   }, []);
 
-  // Fetch subscription status when clerkUser changes
+  // Fetch subscription status when clerkUser changes.
+  // Skip overwriting if user just came back from a successful checkout.
   useEffect(() => {
     if (!clerkUser) {
       setHasAccess(false);
       setSubscriptionLoaded(true);
       return;
     }
+    if (justUpgraded.current) {
+      // They just paid — trust the ?upgraded=1 flag, don't let a slow
+      // Whop API sync overwrite hasAccess. Clear the flag after 30s.
+      setTimeout(() => { justUpgraded.current = false; }, 30_000);
+      return;
+    }
     fetch("/api/subscription/status", { cache: "no-store" })
       .then((r) => r.json())
       .then((d: { hasAccess?: boolean }) => {
-        setHasAccess(d.hasAccess === true);
+        if (!justUpgraded.current) {
+          setHasAccess(d.hasAccess === true);
+        }
         setSubscriptionLoaded(true);
       })
       .catch(() => {
-        setHasAccess(false);
+        if (!justUpgraded.current) setHasAccess(false);
         setSubscriptionLoaded(true);
       });
   }, [clerkUser]);
@@ -97,7 +107,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       url.searchParams.delete("upgraded");
       window.history.replaceState({}, "", url.toString());
       localStorage.removeItem("ps_checkout_started");
+      justUpgraded.current = true;
       setHasAccess(true);
+      setSubscriptionLoaded(true);
       setUpgradeToastVisible(true);
       setTimeout(() => setUpgradeToastVisible(false), 5000);
     }
