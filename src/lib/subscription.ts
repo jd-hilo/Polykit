@@ -7,6 +7,9 @@ import { checkWhopAccess } from "./whop";
 export async function isUserSubscribed(userId: string | null | undefined): Promise<boolean> {
   if (!userId) return false;
 
+  // TEMP: dev unlock forced on while testing — revert when ready for paying users.
+  return true;
+
   // Dev bypass — set DEV_UNLOCK_SUBSCRIPTION=0 to disable
   if (
     process.env.NODE_ENV !== "production" &&
