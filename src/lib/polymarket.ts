@@ -717,6 +717,74 @@ function scoreCandidate(cand: ResolverCandidate, vis: VisionSignals): {
   return { score, breakdown };
 }
 
+/**
+ * Strategy E — public-search.
+ * Polymarket exposes a real full-text search at /public-search that actually
+ * filters server-side (unlike /events?q= and /markets?q= which silently
+ * ignore the param). This catches markets that aren't in the top-volume bulk
+ * pool — e.g. niche markets, older but still active markets, etc.
+ */
+async function strategyE_publicSearch(vis: VisionSignals): Promise<ResolverCandidate[]> {
+  // Build search queries from question + keywords. Run a few in parallel.
+  const queries = new Set<string>();
+  const q = (vis.question ?? "").trim();
+  if (q) queries.add(q);
+
+  const kws = (vis.keywords ?? []).map((k) => String(k).trim()).filter(Boolean);
+  if (kws.length > 0) {
+    // Also try a 2-3 word combination of top keywords for broader recall.
+    queries.add(kws.slice(0, 3).join(" "));
+    if (kws[0]) queries.add(kws[0]);
+  }
+  // Top 3 content words from question as a fallback.
+  const cw = contentWords(q);
+  if (cw.length >= 2) queries.add(cw.slice(0, 3).join(" "));
+
+  const out: ResolverCandidate[] = [];
+  const seen = new Set<string>();
+  await Promise.all(
+    [...queries].slice(0, 4).map(async (query) => {
+      try {
+        const data = await gammaFetch<{
+          events?: Array<{
+            slug?: string;
+            title?: string;
+            markets?: GammaMarket[];
+          }>;
+          markets?: GammaMarket[];
+        }>(`/public-search?q=${encodeURIComponent(query)}&limit_per_type=20`);
+
+        // Expand events → markets with event info injected.
+        for (const e of data?.events ?? []) {
+          const markets = Array.isArray(e.markets) ? e.markets : [];
+          for (const m of markets) {
+            const withEvent: GammaMarket = {
+              ...m,
+              events: m.events ?? [{ slug: e.slug ?? "", title: e.title ?? "", markets }],
+            };
+            const c = candidateFromMarket(withEvent, "E-public-search-event");
+            if (c && !seen.has(c.slug)) {
+              seen.add(c.slug);
+              out.push(c);
+            }
+          }
+        }
+        // Top-level markets too.
+        for (const m of data?.markets ?? []) {
+          const c = candidateFromMarket(m, "E-public-search-market");
+          if (c && !seen.has(c.slug)) {
+            seen.add(c.slug);
+            out.push(c);
+          }
+        }
+      } catch {
+        /* ignore individual query failure */
+      }
+    }),
+  );
+  return out;
+}
+
 async function strategyA_slug(vis: VisionSignals): Promise<ResolverCandidate[]> {
   const slug = vis.slug_guess ? slugFromUrl(vis.slug_guess) : null;
   if (!slug) return [];
@@ -946,17 +1014,18 @@ export async function resolveBestMarket(
   };
 
   // Run strategies in parallel.
-  const [a, b, c, d] = await Promise.all([
+  const [a, b, c, d, e] = await Promise.all([
     strategyA_slug(vis),
     strategyB_multiQuery(vis),
     strategyC_events(vis),
     strategyD_outcomes(vis),
+    strategyE_publicSearch(vis),
   ]);
 
   // Merge, dedupe by slug, preferring earlier strategies' labels.
   const all: ResolverCandidate[] = [];
   const seen = new Set<string>();
-  for (const arr of [a, b, c, d]) {
+  for (const arr of [a, b, c, d, e]) {
     for (const cand of arr) {
       if (!seen.has(cand.slug)) {
         seen.add(cand.slug);
