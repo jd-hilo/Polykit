@@ -398,8 +398,10 @@ export async function searchPolymarketByQuestion(
     }
   }
 
-  // Require at least 2 shared content words to accept.
-  if (!bestMarket || bestScore < 2) return null;
+  // Require at least 1 shared content word to accept. Vision often paraphrases
+  // the question slightly so a strict 2-word threshold rejected too many real
+  // matches.
+  if (!bestMarket || bestScore < 1) return null;
 
   // Inject event metadata into the market so normalizeMarket sees siblings.
   const withEvent: GammaMarket = {
@@ -499,12 +501,28 @@ async function cachedEventsBulk(): Promise<GammaEvent[]> {
   const cached = cacheGet(gammaEventsCache, key);
   if (cached) return cached;
   try {
-    const data = await gammaFetch<GammaEvent[]>(
-      `/events?active=true&closed=false&limit=200&order=volume24hr&ascending=false`,
-    );
-    const arr = Array.isArray(data) ? data : [];
-    cacheSet(gammaEventsCache, key, arr);
-    return arr;
+    // Fetch two pools and merge: top by 24h volume (active/trending) and top by
+    // total volume (long-running but quiet markets). Without this merge,
+    // markets that exist on Polymarket but aren't trading heavily today
+    // can't be resolved from a screenshot.
+    const [byDayVol, byTotalVol] = await Promise.all([
+      gammaFetch<GammaEvent[]>(
+        `/events?active=true&closed=false&limit=300&order=volume24hr&ascending=false`,
+      ).catch(() => [] as GammaEvent[]),
+      gammaFetch<GammaEvent[]>(
+        `/events?active=true&closed=false&limit=300&order=volume&ascending=false`,
+      ).catch(() => [] as GammaEvent[]),
+    ]);
+    const seen = new Set<string>();
+    const merged: GammaEvent[] = [];
+    for (const e of [...(byDayVol ?? []), ...(byTotalVol ?? [])]) {
+      const id = e?.slug ?? "";
+      if (!id || seen.has(id)) continue;
+      seen.add(id);
+      merged.push(e);
+    }
+    cacheSet(gammaEventsCache, key, merged);
+    return merged;
   } catch {
     cacheSet(gammaEventsCache, key, []);
     return [];
