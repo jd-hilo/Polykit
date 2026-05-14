@@ -3,7 +3,7 @@ import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
 import { Nav } from "@/components/layout/Nav";
 import { Footer } from "@/components/layout/Footer";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://polykit.io";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://polykit.co";
 const EFFECTIVE_DATE = "April 22, 2026";
 
 export const metadata: Metadata = {

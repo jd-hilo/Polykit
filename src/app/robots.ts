@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://polykit.io";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://polykit.co";
 
 // AI crawlers and answer-engine user-agents we explicitly welcome.
 // Keep this list current — new ones appear every few months.

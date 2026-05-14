@@ -12,7 +12,7 @@ import { ProfitCalculator } from "@/components/home/ProfitCalculator";
 import { FAQ } from "@/components/home/FAQ";
 import { UrgencyBanner } from "@/components/home/UrgencyBanner";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://polykit.io";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://polykit.co";
 
 export const metadata: Metadata = {
   title: "Polykit — AI Companion for Polymarket & Kalshi Prediction Markets",

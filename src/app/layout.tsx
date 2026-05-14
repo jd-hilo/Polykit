@@ -3,7 +3,7 @@ import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { AuthProvider } from "@/components/auth/AuthProvider";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://polykit.io";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://polykit.co";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

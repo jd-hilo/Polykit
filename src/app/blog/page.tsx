@@ -6,7 +6,7 @@ import { Nav } from "@/components/layout/Nav";
 import { Footer } from "@/components/layout/Footer";
 import { POSTS } from "@/lib/blog";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://polykit.io";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://polykit.co";
 
 export const metadata: Metadata = {
   title: "The Polykit Blog — Prediction Market Guides & AI Edge Breakdowns",

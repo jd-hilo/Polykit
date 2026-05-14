@@ -6,7 +6,7 @@ import { PricingCard } from "@/components/home/PricingCard";
 import { UrgencyBanner } from "@/components/home/UrgencyBanner";
 import { FAQ } from "@/components/home/FAQ";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://polykit.io";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://polykit.co";
 
 export const metadata: Metadata = {
   title: "Pricing — Polykit | Start for $1 — AI for Polymarket & Kalshi",
