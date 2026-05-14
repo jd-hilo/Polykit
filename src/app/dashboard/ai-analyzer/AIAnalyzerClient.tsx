@@ -303,7 +303,7 @@ export default function AIAnalyzerClient() {
                   height={24}
                   style={{ width: 24, height: 24, borderRadius: 6 }}
                 />
-                Polykit.io AI analyzer
+                Polykit AI analyzer
               </h2>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <QPToggle effort={effort} onChange={setEffort} disabled={stage === "loading"} />

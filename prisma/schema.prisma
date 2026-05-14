@@ -9,12 +9,30 @@ datasource db {
 }
 
 model Subscription {
+  // We key by Clerk userId — one Clerk account = one Polykit subscription.
   userId              String   @id @map("user_id")
+
+  // Whop fields (active payment system).
+  whopMembershipId    String?  @unique @map("whop_membership_id")
+  whopUserId          String?  @map("whop_user_id")
+  whopPlanId          String?  @map("whop_plan_id")
+  email               String?
+
+  // active | canceled | expired | past_due | trialing
+  status              String?
+
+  // When access ends — used to grant access even after `canceled` until the
+  // paid period runs out.
+  expiresAt           DateTime? @map("expires_at") @db.Timestamptz
+
+  // Legacy Stripe fields (kept so old data isn't lost; safe to drop later).
   stripeCustomerId    String?  @map("stripe_customer_id")
   stripeSubscriptionId String? @map("stripe_subscription_id")
-  status              String?
   currentPeriodEnd    DateTime? @map("current_period_end") @db.Timestamptz
+
   updatedAt           DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@index([email])
   @@map("subscriptions")
 }
 
