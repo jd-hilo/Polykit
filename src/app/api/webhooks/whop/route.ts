@@ -54,23 +54,63 @@ type WhopMembership = {
   metadata?: Record<string, string | number | boolean | null | undefined>;
 };
 
-function verifySignature(rawBody: string, signature: string | null, secret: string): boolean {
-  if (!signature) return false;
-  // Whop sends the signature as a hex HMAC-SHA256 — sometimes prefixed with
-  // "sha256=" or sent as a base64 string. Accept either.
-  const expectedHex = crypto.createHmac("sha256", secret).update(rawBody).digest("hex");
-  const expectedB64 = crypto.createHmac("sha256", secret).update(rawBody).digest("base64");
-  const cleaned = signature.replace(/^sha256=/i, "").trim();
+function safeEq(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
   try {
-    if (cleaned.length === expectedHex.length) {
-      return crypto.timingSafeEqual(Buffer.from(cleaned), Buffer.from(expectedHex));
-    }
-    if (cleaned.length === expectedB64.length) {
-      return crypto.timingSafeEqual(Buffer.from(cleaned), Buffer.from(expectedB64));
-    }
+    return crypto.timingSafeEqual(Buffer.from(a), Buffer.from(b));
   } catch {
     return false;
   }
+}
+
+function hmac(secret: string, payload: string, encoding: "hex" | "base64"): string {
+  return crypto.createHmac("sha256", secret).update(payload).digest(encoding);
+}
+
+function verifySignature(rawBody: string, signature: string | null, secret: string): boolean {
+  if (!signature) return false;
+
+  // Format A — Stripe-style: "t=<unix>,v1=<hex>" (Whop v2+ uses this)
+  //   Signed payload = "<unix>.<rawBody>"
+  if (signature.includes("t=") && signature.includes("v1=")) {
+    const parts = Object.fromEntries(
+      signature.split(",").map((kv) => {
+        const i = kv.indexOf("=");
+        return [kv.slice(0, i).trim(), kv.slice(i + 1).trim()];
+      }),
+    );
+    const t = parts.t;
+    const v1 = parts.v1;
+    if (!t || !v1) return false;
+    const expected = hmac(secret, `${t}.${rawBody}`, "hex");
+    if (safeEq(v1, expected)) {
+      console.log("[whop-webhook] sig OK (v1 timestamp format)");
+      return true;
+    }
+    console.warn("[whop-webhook] sig FAIL (v1 timestamp format). v1.len=%d expected.len=%d",
+      v1.length, expected.length);
+    return false;
+  }
+
+  // Format B — Plain hex or base64, optionally with "sha256=" prefix.
+  const cleaned = signature.replace(/^sha256=/i, "").trim();
+  const expectedHex = hmac(secret, rawBody, "hex");
+  const expectedB64 = hmac(secret, rawBody, "base64");
+  if (safeEq(cleaned, expectedHex)) {
+    console.log("[whop-webhook] sig OK (hex format)");
+    return true;
+  }
+  if (safeEq(cleaned, expectedB64)) {
+    console.log("[whop-webhook] sig OK (base64 format)");
+    return true;
+  }
+  console.warn(
+    "[whop-webhook] sig FAIL (plain). got.len=%d hex.len=%d b64.len=%d sample=%s",
+    cleaned.length,
+    expectedHex.length,
+    expectedB64.length,
+    cleaned.slice(0, 12),
+  );
   return false;
 }
 
@@ -118,7 +158,18 @@ export async function POST(req: Request) {
     req.headers.get("x-signature");
 
   if (!verifySignature(rawBody, sig, secret)) {
-    console.warn("[whop-webhook] signature verification failed");
+    // Log every signature-related header so we can see what Whop is sending.
+    const sigHeaders: Record<string, string> = {};
+    req.headers.forEach((v, k) => {
+      if (k.toLowerCase().includes("sig") || k.toLowerCase().includes("whop")) {
+        sigHeaders[k] = v;
+      }
+    });
+    console.warn(
+      "[whop-webhook] signature verification failed. headers=%s bodyPrefix=%s",
+      JSON.stringify(sigHeaders),
+      rawBody.slice(0, 80),
+    );
     return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
   }
 
