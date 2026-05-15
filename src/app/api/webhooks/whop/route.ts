@@ -67,11 +67,85 @@ function hmac(secret: string, payload: string, encoding: "hex" | "base64"): stri
   return crypto.createHmac("sha256", secret).update(payload).digest(encoding);
 }
 
-function verifySignature(rawBody: string, signature: string | null, secret: string): boolean {
-  if (!signature) return false;
+/**
+ * Decode the Whop webhook secret into raw key bytes.
+ *
+ * Whop uses Svix under the hood. Svix's official secret format is
+ * `whsec_<base64>`. Whop wraps it as `ws_<hex>` — strip the prefix and
+ * hex-decode to get the actual HMAC key. We also try the raw string as
+ * a fallback in case the format changes.
+ */
+function secretCandidates(secret: string): Buffer[] {
+  const out: Buffer[] = [];
+  // Strategy 1: ws_<hex> → hex bytes
+  if (secret.startsWith("ws_")) {
+    const hex = secret.slice(3);
+    if (/^[0-9a-fA-F]+$/.test(hex) && hex.length % 2 === 0) {
+      out.push(Buffer.from(hex, "hex"));
+    }
+  }
+  // Strategy 2: whsec_<base64> (standard Svix)
+  if (secret.startsWith("whsec_")) {
+    try {
+      out.push(Buffer.from(secret.slice(6), "base64"));
+    } catch {
+      /* ignore */
+    }
+  }
+  // Strategy 3: raw secret string as bytes
+  out.push(Buffer.from(secret, "utf8"));
+  return out;
+}
 
-  // Format A — Stripe-style: "t=<unix>,v1=<hex>" (Whop v2+ uses this)
-  //   Signed payload = "<unix>.<rawBody>"
+function svixSign(keyBytes: Buffer, payload: string): string {
+  return crypto.createHmac("sha256", keyBytes).update(payload).digest("base64");
+}
+
+function verifySvix(
+  rawBody: string,
+  webhookId: string | null,
+  webhookTimestamp: string | null,
+  webhookSignature: string | null,
+  secret: string,
+): boolean {
+  if (!webhookId || !webhookTimestamp || !webhookSignature) return false;
+
+  const signedPayload = `${webhookId}.${webhookTimestamp}.${rawBody}`;
+  // Header may contain multiple space-separated "v1,<sig>" entries (key rotation).
+  const provided = webhookSignature
+    .split(" ")
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .map((entry) => {
+      // "v1,<base64>" — comma separates version from sig.
+      const i = entry.indexOf(",");
+      return i >= 0 ? { version: entry.slice(0, i), sig: entry.slice(i + 1) } : null;
+    })
+    .filter((x): x is { version: string; sig: string } => x !== null && x.version === "v1");
+
+  if (provided.length === 0) return false;
+
+  for (const keyBytes of secretCandidates(secret)) {
+    const expected = svixSign(keyBytes, signedPayload);
+    for (const p of provided) {
+      if (safeEq(p.sig, expected)) {
+        console.log("[whop-webhook] sig OK (svix, keyLen=%d)", keyBytes.length);
+        return true;
+      }
+    }
+  }
+  console.warn(
+    "[whop-webhook] sig FAIL (svix). providedCount=%d firstSigLen=%d signedPayloadLen=%d",
+    provided.length,
+    provided[0]?.sig.length ?? 0,
+    signedPayload.length,
+  );
+  return false;
+}
+
+function verifyLegacy(rawBody: string, signature: string | null, secret: string): boolean {
+  if (!signature) return false;
+  // Stripe-style "t=...,v1=..."
   if (signature.includes("t=") && signature.includes("v1=")) {
     const parts = Object.fromEntries(
       signature.split(",").map((kv) => {
@@ -79,39 +153,16 @@ function verifySignature(rawBody: string, signature: string | null, secret: stri
         return [kv.slice(0, i).trim(), kv.slice(i + 1).trim()];
       }),
     );
-    const t = parts.t;
-    const v1 = parts.v1;
-    if (!t || !v1) return false;
-    const expected = hmac(secret, `${t}.${rawBody}`, "hex");
-    if (safeEq(v1, expected)) {
-      console.log("[whop-webhook] sig OK (v1 timestamp format)");
-      return true;
-    }
-    console.warn("[whop-webhook] sig FAIL (v1 timestamp format). v1.len=%d expected.len=%d",
-      v1.length, expected.length);
-    return false;
+    if (!parts.t || !parts.v1) return false;
+    const expected = hmac(secret, `${parts.t}.${rawBody}`, "hex");
+    return safeEq(parts.v1, expected);
   }
-
-  // Format B — Plain hex or base64, optionally with "sha256=" prefix.
+  // Plain hex or base64
   const cleaned = signature.replace(/^sha256=/i, "").trim();
-  const expectedHex = hmac(secret, rawBody, "hex");
-  const expectedB64 = hmac(secret, rawBody, "base64");
-  if (safeEq(cleaned, expectedHex)) {
-    console.log("[whop-webhook] sig OK (hex format)");
-    return true;
-  }
-  if (safeEq(cleaned, expectedB64)) {
-    console.log("[whop-webhook] sig OK (base64 format)");
-    return true;
-  }
-  console.warn(
-    "[whop-webhook] sig FAIL (plain). got.len=%d hex.len=%d b64.len=%d sample=%s",
-    cleaned.length,
-    expectedHex.length,
-    expectedB64.length,
-    cleaned.slice(0, 12),
+  return (
+    safeEq(cleaned, hmac(secret, rawBody, "hex")) ||
+    safeEq(cleaned, hmac(secret, rawBody, "base64"))
   );
-  return false;
 }
 
 function parseTimestamp(v: number | string | null | undefined): Date | null {
@@ -151,17 +202,28 @@ export async function POST(req: Request) {
 
   const rawBody = await req.text();
 
-  // Whop sends the signature in a header — name varies. Check a few.
-  const sig =
+  // Svix-style headers (current Whop format).
+  const svixId = req.headers.get("webhook-id") ?? req.headers.get("svix-id");
+  const svixTimestamp =
+    req.headers.get("webhook-timestamp") ?? req.headers.get("svix-timestamp");
+  const svixSignature =
+    req.headers.get("webhook-signature") ?? req.headers.get("svix-signature");
+
+  // Legacy headers (older Whop / custom HMAC).
+  const legacySig =
     req.headers.get("x-whop-signature") ??
     req.headers.get("whop-signature") ??
     req.headers.get("x-signature");
 
-  if (!verifySignature(rawBody, sig, secret)) {
-    // Log every signature-related header so we can see what Whop is sending.
+  const ok =
+    verifySvix(rawBody, svixId, svixTimestamp, svixSignature, secret) ||
+    verifyLegacy(rawBody, legacySig, secret);
+
+  if (!ok) {
     const sigHeaders: Record<string, string> = {};
     req.headers.forEach((v, k) => {
-      if (k.toLowerCase().includes("sig") || k.toLowerCase().includes("whop")) {
+      const lk = k.toLowerCase();
+      if (lk.includes("sig") || lk.includes("whop") || lk.includes("webhook") || lk.includes("svix")) {
         sigHeaders[k] = v;
       }
     });
