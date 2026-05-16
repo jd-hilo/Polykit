@@ -4,14 +4,28 @@ import { prisma } from "@/lib/prisma";
 
 export const runtime = "nodejs";
 
+/**
+ * Create a Whop checkout session for the signed-in user and return the
+ * hosted-checkout URL the client should redirect to.
+ *
+ * Canonical Whop flow (per https://docs.whop.com/api-reference/v2/checkout-sessions/create-a-checkout-session):
+ *   POST https://api.whop.com/api/v2/checkout_sessions
+ *   body: { plan_id, redirect_url, metadata }
+ *   response: { id, purchase_url, ... }
+ *
+ * `metadata.clerk_user_id` propagates through to the membership and into
+ * every webhook event for this purchase, so the webhook handler can map
+ * the Whop membership back to the right Clerk userId without guessing.
+ */
 export async function POST() {
   const { userId } = await auth();
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_WHOP_CHECKOUT_URL;
-  if (!baseUrl) {
+  const apiKey = process.env.WHOP_API_KEY;
+  const planId = process.env.WHOP_PLAN_ID;
+  if (!apiKey || !planId) {
     return NextResponse.json({ error: "Checkout not configured" }, { status: 500 });
   }
 
@@ -34,7 +48,6 @@ export async function POST() {
         select: { userId: true },
       });
       if (orphan) {
-        // Use a transaction-style swap: delete the old row, upsert new key.
         await prisma.$transaction(async (tx) => {
           const data = await tx.subscription.findUnique({ where: { userId: orphan.userId } });
           if (!data) return;
@@ -58,19 +71,48 @@ export async function POST() {
     }
   }
 
-  // Pre-fill the Whop checkout email and pass clerk_user_id as metadata so
-  // the webhook can map the membership back to this Polykit user.
-  let url = baseUrl;
-  if (email) {
-    try {
-      const u = new URL(baseUrl);
-      u.searchParams.set("email", email);
-      u.searchParams.set("metadata[clerk_user_id]", userId);
-      url = u.toString();
-    } catch {
-      /* base URL malformed — fall through */
-    }
+  // Where to send the customer after they complete payment.
+  const origin =
+    process.env.NEXT_PUBLIC_APP_URL ??
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://www.polykit.co");
+  const redirectUrl = `${origin}/dashboard?checkout=success`;
+
+  // Create the session via Whop's API.
+  let resp: Response;
+  try {
+    resp = await fetch("https://api.whop.com/api/v2/checkout_sessions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        plan_id: planId,
+        redirect_url: redirectUrl,
+        metadata: { clerk_user_id: userId },
+      }),
+      cache: "no-store",
+    });
+  } catch (e) {
+    console.error("[checkout] network error talking to Whop", e);
+    return NextResponse.json({ error: "Whop unreachable" }, { status: 502 });
   }
 
-  return NextResponse.json({ url });
+  if (!resp.ok) {
+    const text = await resp.text().catch(() => "");
+    console.error("[checkout] Whop session create failed status=%d body=%s", resp.status, text);
+    return NextResponse.json({ error: "Failed to create checkout session" }, { status: 502 });
+  }
+
+  const session = (await resp.json()) as {
+    id?: string;
+    purchase_url?: string;
+  };
+
+  if (!session.purchase_url) {
+    console.error("[checkout] Whop response missing purchase_url: %j", session);
+    return NextResponse.json({ error: "Invalid checkout response" }, { status: 502 });
+  }
+
+  return NextResponse.json({ url: session.purchase_url });
 }
