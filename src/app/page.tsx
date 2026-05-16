@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     "prediction market edge",
     "Polymarket wallet tracker",
     "paper trading prediction markets",
-    "copy trading Polymarket",
+    "smart money Polymarket",
   ],
   openGraph: {
     type: "website",
