@@ -85,8 +85,21 @@ function isActiveRow(
 ): boolean {
   if (!status) return false;
   const s = status.toLowerCase();
-  const okStatus = s === "active" || s === "trialing";
-  if (!okStatus) return false;
-  if (!expiresAt) return true; // null expiry → permanent access
-  return expiresAt.getTime() > Date.now();
+
+  // "active" / "trialing" — full access while expiresAt is in the future
+  // (or forever if expiresAt is null).
+  if (s === "active" || s === "trialing") {
+    if (!expiresAt) return true;
+    return expiresAt.getTime() > Date.now();
+  }
+
+  // "canceled" — the user opted out of renewal, but they paid for the
+  // current period. Grant access until expiresAt passes. After that, the
+  // row falls through to expired below.
+  if (s === "canceled" || s === "cancelled") {
+    return !!expiresAt && expiresAt.getTime() > Date.now();
+  }
+
+  // Everything else (expired, past_due, unpaid, refunded, unknown) → no access.
+  return false;
 }
