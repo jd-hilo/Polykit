@@ -45,6 +45,8 @@ type WhopMembership = {
   user_id?: string;
   plan_id?: string;
   product_id?: string;
+  plan?: { id?: string };
+  product?: { id?: string };
   status?: string;
   valid?: boolean;
   expires_at?: number | string | null;
@@ -183,14 +185,21 @@ function parseTimestamp(v: number | string | null | undefined): Date | null {
 
 function normalizeStatus(action: string | undefined, m: WhopMembership): string {
   // Trust the membership's status string first when present.
-  if (m.status && typeof m.status === "string") return m.status.toLowerCase();
+  if (m.status && typeof m.status === "string") {
+    const s = m.status.toLowerCase();
+    // "paid" comes from payment events — map to active (those are filtered
+    // out upstream now, but defend anyway).
+    if (s === "paid" || s === "successful") return "active";
+    return s;
+  }
 
   // Otherwise derive from the action.
   const a = (action ?? "").toLowerCase();
-  if (a.includes("went_valid") || a.includes("payment.succeeded")) return "active";
-  if (a.includes("went_invalid") || a.includes("expired")) return "expired";
+  if (a.includes("activated") || a.includes("went_valid")) return "active";
+  if (a.includes("went_invalid") || a.includes("deactivated") || a.includes("expired"))
+    return "expired";
   if (a.includes("canceled") || a.includes("cancelled")) return "canceled";
-  if (a.includes("payment.failed") || a.includes("past_due")) return "past_due";
+  if (a.includes("past_due")) return "past_due";
   return "unknown";
 }
 
@@ -245,6 +254,16 @@ export async function POST(req: Request) {
 
   const action = event.action ?? event.type ?? "";
   const m = event.data ?? {};
+
+  // Skip payment.* events — Whop fires them alongside membership.* events
+  // for the same purchase, but they contain a *payment* object (status: "paid",
+  // id: pay_xxx) rather than a membership. Trusting their status overwrites
+  // the good "trialing"/"active" row from the membership event. Membership
+  // events carry everything we need.
+  if (action.toLowerCase().startsWith("payment.")) {
+    console.log("[whop-webhook] ignored payment.* event (action=%s)", action);
+    return NextResponse.json({ ok: true, skipped: "payment event" });
+  }
 
   // Resolve the Clerk userId for this membership. Prefer metadata (set when
   // we redirect to checkout), fall back to looking up by email.
@@ -312,7 +331,7 @@ export async function POST(req: Request) {
     userId,
     whopMembershipId: m.id ?? null,
     whopUserId: m.user?.id ?? m.user_id ?? null,
-    whopPlanId: m.plan_id ?? m.product_id ?? null,
+    whopPlanId: m.plan?.id ?? m.plan_id ?? m.product?.id ?? m.product_id ?? null,
     email,
     status,
     expiresAt,
