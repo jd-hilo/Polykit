@@ -1,10 +1,10 @@
 const CARDS = [
-  { caption: "@manifold_moose", gain: "+$3,482,910", img: "/social_proof_candid/14_private_jet_champagne.jpg" },
-  { caption: "@yesorno_vic", gain: "+$128,411", img: "/social_proof_candid/01_ferrari_night_lean.jpg" },
-  { caption: "@oddsbreaker7", gain: "+$14,000", img: "/social_proof_candid/09_lambo_yellow_london.jpg" },
-  { caption: "@contrarian_pete", gain: "+$9,127", img: "/social_proof_candid/15_private_jet_laptop.jpg" },
-  { caption: "@liquidityghost", gain: "+$6,810", img: "/social_proof_candid/04_hoodie_sports_car_garage.jpg" },
+  { caption: "@manifold_moose", gain: "+$25,340", img: "/social_proof_candid/14_private_jet_champagne.jpg" },
   { caption: "@sixsigma_sam", gain: "+$22,450", img: "/social_proof_candid/10_mercedes_lv_bags.jpg" },
+  { caption: "@yesorno_vic", gain: "+$14,000", img: "/social_proof_candid/01_ferrari_night_lean.jpg" },
+  { caption: "@oddsbreaker7", gain: "+$9,127", img: "/social_proof_candid/09_lambo_yellow_london.jpg" },
+  { caption: "@contrarian_pete", gain: "+$6,810", img: "/social_proof_candid/15_private_jet_laptop.jpg" },
+  { caption: "@liquidityghost", gain: "+$3,482", img: "/social_proof_candid/04_hoodie_sports_car_garage.jpg" },
 ];
 
 export function SocialProofGallery() {
