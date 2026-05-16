@@ -54,6 +54,8 @@ type WhopMembership = {
   cancel_at_period_end?: boolean;
   user?: { id?: string; email?: string };
   email?: string;
+  member?: { id?: string };
+  manage_url?: string;
   metadata?: Record<string, string | number | boolean | null | undefined>;
 };
 
@@ -327,11 +329,17 @@ export async function POST(req: Request) {
     userId = `whop:${email}`;
   }
 
+  // Prefer the manage_url Whop hands us; fall back to constructing from
+  // the member id (the same path Whop uses on receipts).
+  const manageUrl =
+    m.manage_url ?? (m.member?.id ? `https://whop.com/billing/manage/${m.member.id}` : null);
+
   const data = {
     userId,
     whopMembershipId: m.id ?? null,
     whopUserId: m.user?.id ?? m.user_id ?? null,
     whopPlanId: m.plan?.id ?? m.plan_id ?? m.product?.id ?? m.product_id ?? null,
+    whopManageUrl: manageUrl,
     email,
     status,
     expiresAt,
@@ -345,6 +353,7 @@ export async function POST(req: Request) {
         whopMembershipId: data.whopMembershipId,
         whopUserId: data.whopUserId,
         whopPlanId: data.whopPlanId,
+        whopManageUrl: data.whopManageUrl,
         email: data.email,
         status: data.status,
         expiresAt: data.expiresAt,

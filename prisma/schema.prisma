@@ -16,6 +16,9 @@ model Subscription {
   whopMembershipId    String?  @unique @map("whop_membership_id")
   whopUserId          String?  @map("whop_user_id")
   whopPlanId          String?  @map("whop_plan_id")
+  // URL the customer visits to manage/cancel their subscription on Whop.
+  // Captured from the webhook payload; falls back to a constructed URL.
+  whopManageUrl       String?  @map("whop_manage_url")
   email               String?
 
   // active | canceled | expired | past_due | trialing

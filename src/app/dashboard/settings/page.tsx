@@ -1,7 +1,7 @@
 "use client";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { useUser, useClerk } from "@clerk/nextjs";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CreditCard, LogOut, User, Shield, Bell } from "lucide-react";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -74,9 +74,29 @@ export default function SettingsPage() {
   const { user } = useUser();
   const { openUserProfile } = useClerk();
   const [billingLoading, setBillingLoading] = useState(false);
+  const [manageUrl, setManageUrl] = useState<string>("https://whop.com/@me/settings/orders/");
 
   const email = user?.primaryEmailAddress?.emailAddress ?? "—";
   const name = user?.fullName ?? user?.firstName ?? "—";
+
+  // Fetch the user-specific Whop manage URL (mber_<id>) once we know they
+  // have access. Falls back to the generic billing portal until the webhook
+  // stamps a specific URL on the row.
+  useEffect(() => {
+    if (!hasAccess) return;
+    let cancelled = false;
+    fetch("/api/billing/manage")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data: { url?: string } | null) => {
+        if (!cancelled && data?.url) setManageUrl(data.url);
+      })
+      .catch(() => {
+        /* keep fallback */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [hasAccess]);
 
   async function openBillingPortal() {
     try {
@@ -114,13 +134,13 @@ export default function SettingsPage() {
               icon={CreditCard}
               label="Manage Subscription"
               value="Update card, view invoices"
-              onClick={() => window.open("https://whop.com/hub", "_blank")}
+              onClick={() => window.open(manageUrl, "_blank")}
             />
             <Row
               icon={LogOut}
               label="Cancel Subscription"
               value="Cancel anytime — no hassle"
-              onClick={() => window.open("https://whop.com/hub", "_blank")}
+              onClick={() => window.open(manageUrl, "_blank")}
               danger
               chevron={false}
             />

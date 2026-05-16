@@ -59,6 +59,7 @@ export async function POST() {
               whopMembershipId: data.whopMembershipId,
               whopUserId: data.whopUserId,
               whopPlanId: data.whopPlanId,
+              whopManageUrl: data.whopManageUrl,
               email: data.email,
               status: data.status,
               expiresAt: data.expiresAt,
