@@ -2,7 +2,7 @@
 import { useAuth } from "@/components/auth/AuthProvider";
 import { useUser, useClerk } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
-import { CreditCard, LogOut, User, Shield, Bell } from "lucide-react";
+import { CreditCard, LogOut, User, Shield, Bell, Mail } from "lucide-react";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -176,6 +176,16 @@ export default function SettingsPage() {
       {/* Security */}
       <Section title="Security">
         <Row icon={Shield} label="Password & Security" value="Manage via your account profile" onClick={() => openUserProfile()} />
+      </Section>
+
+      {/* Support */}
+      <Section title="Support">
+        <Row
+          icon={Mail}
+          label="Contact Support"
+          value="hello@hilo.media"
+          onClick={() => { window.location.href = "mailto:hello@hilo.media"; }}
+        />
       </Section>
 
       {/* Danger */}
