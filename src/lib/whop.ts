@@ -29,22 +29,42 @@ export async function checkWhopAccess(email: string): Promise<boolean> {
 
     if (!res.ok) return false;
 
+    // Whop's API returns memberships in two shapes depending on endpoint:
+    //   • List endpoint: { email: "x", plan: "plan_xxx", user: "user_xxx", status, valid }
+    //   • Webhook / single-resource: { user: { email, id }, plan: { id }, status, valid }
+    // Handle both.
     type ApiMembership = {
       plan_id?: string;
-      plan?: { id?: string };
+      plan?: string | { id?: string };
+      product_id?: string;
+      product?: string | { id?: string };
       status?: string;
       valid?: boolean;
-      user?: { email?: string };
+      email?: string;
+      user?: string | { email?: string };
     };
     const data = (await res.json()) as { data?: ApiMembership[] };
 
+    const target = email.toLowerCase();
     const memberships = data.data ?? [];
     return memberships.some((m) => {
-      const emailMatch = m.user?.email?.toLowerCase() === email.toLowerCase();
-      // Whop sometimes returns plan as nested object, sometimes flat plan_id.
-      const planId = m.plan?.id ?? m.plan_id ?? "";
-      const planMatch = planIds.length === 0 || planIds.includes(planId);
-      // Accept active OR trialing OR `valid: true`.
+      const apiEmail = (
+        typeof m.email === "string"
+          ? m.email
+          : typeof m.user === "object"
+            ? m.user?.email
+            : null
+      )?.toLowerCase();
+      const emailMatch = apiEmail === target;
+
+      const apiPlanId =
+        (typeof m.plan === "string" ? m.plan : m.plan?.id) ??
+        m.plan_id ??
+        (typeof m.product === "string" ? m.product : m.product?.id) ??
+        m.product_id ??
+        "";
+      const planMatch = planIds.length === 0 || planIds.includes(apiPlanId);
+
       const status = (m.status ?? "").toLowerCase();
       const statusOk = m.valid === true || status === "active" || status === "trialing";
       return emailMatch && planMatch && statusOk;
