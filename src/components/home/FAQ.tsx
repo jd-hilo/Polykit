@@ -6,7 +6,7 @@ import { useAuth } from "@/components/auth/AuthProvider";
 const ITEMS = [
   { q: "Does it actually work?", a: "Yes. Our AI analyzes thousands of markets daily to surface bets with measurable edge. Users have collectively won over $7.3M using Polykit." },
   { q: "What makes Polykit better than doing my own research?", a: "Speed and breadth. Polykit pulls live news, on-chain wallet data, historical odds and sentiment in seconds — research that would take a human hours." },
-  { q: "Which platforms does Polykit work with?", a: "Polymarket, Kalshi, PredictIt, and other major prediction markets." },
+  { q: "Which platforms does Polykit work with?", a: "Polymarket is our primary platform — paper trading, wallet tracking, and our leaderboard all run on Polymarket data. The AI Market Analyzer works with screenshots from any prediction market (Polymarket, Kalshi, PredictIt, etc.) — just upload an image and our AI handles the rest." },
   { q: "How fast is the analysis?", a: "Under 8 seconds from screenshot upload to full verdict with confidence score, edge calc, and exit plan." },
   { q: "Do I need experience with prediction markets?", a: "No. Polykit explains each pick in plain English and walks you through every step." },
   { q: "Is my money safe?", a: "Polykit never touches your money or wallet. You execute trades yourself on your preferred platform." },
