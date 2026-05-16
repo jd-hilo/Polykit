@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import crypto from "crypto";
+import { clerkClient } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 
 export const runtime = "nodejs";
@@ -262,12 +263,37 @@ export async function POST(req: Request) {
 
   // Find or determine the userId for the upsert key.
   let userId = clerkUserIdFromMeta;
+
+  // Fallback 1 — DB lookup by email (matches if we previously stored a row).
   if (!userId && email) {
     const existing = await prisma.subscription.findFirst({
       where: { email },
       select: { userId: true },
     });
     userId = existing?.userId ?? null;
+  }
+
+  // Fallback 2 — ask Clerk directly. If a Clerk user exists with this email,
+  // use their userId. This handles the common case where the user signed up
+  // for Polykit but the metadata didn't get forwarded through Whop.
+  if (!userId && email) {
+    try {
+      const client = await clerkClient();
+      const list = await client.users.getUserList({ emailAddress: [email] });
+      // Prefer a user whose PRIMARY email matches (Clerk allows multiple).
+      const match =
+        list.data.find((u) => {
+          const primaryId = u.primaryEmailAddressId;
+          const primary = u.emailAddresses.find((e) => e.id === primaryId);
+          return primary?.emailAddress?.toLowerCase() === email;
+        }) ?? list.data[0];
+      if (match) {
+        userId = match.id;
+        console.log("[whop-webhook] resolved Clerk userId via email lookup: %s", userId);
+      }
+    } catch (e) {
+      console.error("[whop-webhook] Clerk email lookup failed", e);
+    }
   }
 
   if (!userId) {
