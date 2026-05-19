@@ -76,7 +76,11 @@ export async function POST() {
   const origin =
     process.env.NEXT_PUBLIC_APP_URL ??
     (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://www.polykit.co");
-  const redirectUrl = `${origin}/dashboard?checkout=success`;
+  // AuthProvider listens for `?upgraded=1` to short-circuit the paywall and
+  // show a success toast. Use that flag so the post-checkout return reliably
+  // suppresses the "you don't have access" modals even before the webhook
+  // has finished writing the subscription row.
+  const redirectUrl = `${origin}/dashboard?upgraded=1`;
 
   // Create the session via Whop's API.
   let resp: Response;

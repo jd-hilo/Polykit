@@ -84,19 +84,48 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
   }, [clerkUser]);
 
-  // Auto-fire PaywallModal after new Google/Apple signup (within 2 min)
+  // Auto-fire PaywallModal after new Google/Apple signup (within 2 min).
+  // Re-verifies hasAccess server-side right before opening to avoid showing
+  // the modal to users whose webhook hasn't finished writing the DB row yet.
   useEffect(() => {
     if (!clerkUser || !isLoaded || !subscriptionLoaded) return;
     if (hasAccess) return;
+    if (justUpgraded.current) return;
+    // Defense-in-depth: if the URL signals a return from checkout, never
+    // pop the upsell modal in this session.
+    if (typeof window !== "undefined") {
+      const sp = new URL(window.location.href).searchParams;
+      if (sp.get("upgraded") === "1" || sp.get("checkout") === "success") return;
+    }
     const createdAt = clerkUser.createdAt ? new Date(clerkUser.createdAt).getTime() : 0;
     const isNew = Date.now() - createdAt < 120_000;
     const isOAuth = clerkUser.externalAccounts.length > 0;
     const alreadySeen =
       typeof window !== "undefined" && localStorage.getItem("pk_offer_seen") === "1";
-    if (isNew && isOAuth && !alreadySeen) {
-      if (typeof window !== "undefined") localStorage.setItem("pk_offer_seen", "1");
-      setPaywallOpen(true);
-    }
+    if (!isNew || !isOAuth || alreadySeen) return;
+
+    // Re-verify access on the server one more time before opening — the
+    // initial fetch may have raced ahead of a slow Whop webhook.
+    let cancelled = false;
+    fetch("/api/subscription/status", { cache: "no-store" })
+      .then((r) => r.json())
+      .then((d: { hasAccess?: boolean }) => {
+        if (cancelled) return;
+        if (d.hasAccess === true) {
+          setHasAccess(true);
+          return;
+        }
+        if (typeof window !== "undefined") localStorage.setItem("pk_offer_seen", "1");
+        setPaywallOpen(true);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        if (typeof window !== "undefined") localStorage.setItem("pk_offer_seen", "1");
+        setPaywallOpen(true);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [clerkUser, isLoaded, subscriptionLoaded, hasAccess]);
 
   // Detect ?upgraded=1 on mount (post-purchase) and ?canceled=1 (checkout canceled)
@@ -131,22 +160,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     function checkReturnFromCheckout() {
       if (localStorage.getItem("ps_checkout_started") !== "1") return;
       // Let the subscription refetch win if they actually upgraded.
-      if (hasAccess) {
+      if (hasAccess || justUpgraded.current) {
+        localStorage.removeItem("ps_checkout_started");
+        return;
+      }
+      // If the URL still carries the post-checkout signal, do NOT pop the
+      // return modal — the webhook may just be lagging by a few seconds.
+      const sp = new URL(window.location.href).searchParams;
+      if (sp.get("upgraded") === "1" || sp.get("checkout") === "success") {
         localStorage.removeItem("ps_checkout_started");
         return;
       }
       localStorage.removeItem("ps_checkout_started");
-      // Re-check subscription — if still no access after a moment, show modal.
-      fetch("/api/subscription/status", { cache: "no-store" })
-        .then((r) => r.json())
-        .then((d: { hasAccess?: boolean }) => {
-          if (d.hasAccess === true) {
-            setHasAccess(true);
-          } else {
-            setReturnOpen(true);
-          }
-        })
-        .catch(() => setReturnOpen(true));
+      // Re-check subscription. Poll briefly to give the webhook time to land
+      // before showing "you didn't subscribe" — webhook can take 5–10s under load.
+      const start = Date.now();
+      const poll = () => {
+        fetch("/api/subscription/status", { cache: "no-store" })
+          .then((r) => r.json())
+          .then((d: { hasAccess?: boolean }) => {
+            if (d.hasAccess === true) {
+              setHasAccess(true);
+              return;
+            }
+            if (Date.now() - start < 8000) {
+              setTimeout(poll, 1500);
+            } else {
+              setReturnOpen(true);
+            }
+          })
+          .catch(() => {
+            if (Date.now() - start < 8000) setTimeout(poll, 1500);
+            else setReturnOpen(true);
+          });
+      };
+      poll();
     }
 
     // Fires on bfcache restore (back button from Whop on mobile/desktop).
