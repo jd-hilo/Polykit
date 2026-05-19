@@ -1,8 +1,26 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 
 export const runtime = "nodejs";
+
+/**
+ * Derive the public origin of the request from the incoming headers.
+ * We use this (rather than NEXT_PUBLIC_APP_URL or VERCEL_URL) so the
+ * post-checkout redirect lands on the SAME host the user signed in
+ * on — Clerk's session cookies are scoped to that exact host. If we
+ * always sent users to `www.polykit.co` but they originally signed
+ * in on `polykit.co` (or vice versa), they'd be bounced to sign-in
+ * after paying because the cookie doesn't follow them across hosts.
+ */
+function originFromRequest(req: NextRequest): string {
+  const host =
+    req.headers.get("x-forwarded-host") ??
+    req.headers.get("host") ??
+    "www.polykit.co";
+  const proto = req.headers.get("x-forwarded-proto") ?? "https";
+  return `${proto}://${host}`;
+}
 
 /**
  * Create a Whop checkout session for the signed-in user and return the
@@ -17,7 +35,7 @@ export const runtime = "nodejs";
  * every webhook event for this purchase, so the webhook handler can map
  * the Whop membership back to the right Clerk userId without guessing.
  */
-export async function POST() {
+export async function POST(req: NextRequest) {
   const { userId } = await auth();
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -72,15 +90,11 @@ export async function POST() {
     }
   }
 
-  // Where to send the customer after they complete payment.
-  const origin =
-    process.env.NEXT_PUBLIC_APP_URL ??
-    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://www.polykit.co");
   // AuthProvider listens for `?upgraded=1` to short-circuit the paywall and
   // show a success toast. Use that flag so the post-checkout return reliably
   // suppresses the "you don't have access" modals even before the webhook
   // has finished writing the subscription row.
-  const redirectUrl = `${origin}/dashboard?upgraded=1`;
+  const redirectUrl = `${originFromRequest(req)}/dashboard?upgraded=1`;
 
   // Create the session via Whop's API.
   let resp: Response;
