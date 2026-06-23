@@ -3,6 +3,7 @@ import { useAuth } from "@/components/auth/AuthProvider";
 import { useUser, useClerk } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
 import { CreditCard, LogOut, User, Shield, Bell, Mail } from "lucide-react";
+import { analytics } from "@/lib/analytics";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -150,6 +151,7 @@ export default function SettingsPage() {
           <div style={{ padding: "0 18px 14px" }}>
             <button
               onClick={async () => {
+                analytics.checkoutStarted("settings");
                 if (typeof window !== "undefined") localStorage.setItem("ps_checkout_started", "1");
                 const res = await fetch("/api/stripe/checkout", {
                   method: "POST",

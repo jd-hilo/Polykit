@@ -1,6 +1,8 @@
 "use client";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useClerk, useUser } from "@clerk/nextjs";
+import posthog from "posthog-js";
+import { analytics } from "@/lib/analytics";
 import { PaywallModal } from "./PaywallModal";
 import { ReturnPaywallModal } from "./ReturnPaywallModal";
 
@@ -9,7 +11,7 @@ type AuthState = {
   user: User | null;
   hasAccess: boolean;
   subscriptionLoaded: boolean;
-  openAuth: () => void;
+  openAuth: (location?: string) => void;
   openPaywall: () => void;
   openReturnPaywall: () => void;
   openGate: () => void;
@@ -42,6 +44,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       email: clerkUser.primaryEmailAddress?.emailAddress ?? "",
     };
   }, [isLoaded, clerkUser]);
+
+  useEffect(() => {
+    if (!isLoaded) return;
+    if (!clerkUser) {
+      posthog.reset();
+      return;
+    }
+    posthog.identify(clerkUser.id, {
+      email: clerkUser.primaryEmailAddress?.emailAddress,
+      name: clerkUser.fullName,
+      has_access: hasAccess,
+    });
+  }, [isLoaded, clerkUser, hasAccess]);
 
   const refetchSubscription = useCallback(() => {
     fetch("/api/subscription/status", { cache: "no-store" })
@@ -116,11 +131,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           return;
         }
         if (typeof window !== "undefined") localStorage.setItem("pk_offer_seen", "1");
+        analytics.paywallViewed("oauth_signup");
         setPaywallOpen(true);
       })
       .catch(() => {
         if (cancelled) return;
         if (typeof window !== "undefined") localStorage.setItem("pk_offer_seen", "1");
+        analytics.paywallViewed("oauth_signup");
         setPaywallOpen(true);
       });
     return () => {
@@ -139,6 +156,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       justUpgraded.current = true;
       setHasAccess(true);
       setSubscriptionLoaded(true);
+      analytics.subscriptionActivated();
       setUpgradeToastVisible(true);
       setTimeout(() => setUpgradeToastVisible(false), 5000);
     }
@@ -214,7 +232,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
   }, [hasAccess]);
 
-  const openAuth = useCallback(() => {
+  const openAuth = useCallback((location = "unknown") => {
+    analytics.ctaClicked(location);
     if (user) {
       if (typeof window !== "undefined") window.location.href = "/dashboard";
       return;
@@ -229,13 +248,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const alreadySeen =
       typeof window !== "undefined" && localStorage.getItem("pk_offer_seen") === "1";
     if (alreadySeen) {
+      analytics.paywallViewed("return");
       setReturnOpen(true);
     } else {
+      analytics.paywallViewed("initial");
       setPaywallOpen(true);
     }
   }, []);
 
   const signOut = useCallback(() => {
+    posthog.capture("user_signed_out");
+    posthog.reset();
     void clerkSignOut();
   }, [clerkSignOut]);
 
@@ -245,8 +268,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       hasAccess,
       subscriptionLoaded,
       openAuth,
-      openPaywall: () => setPaywallOpen(true),
-      openReturnPaywall: () => setReturnOpen(true),
+      openPaywall: () => {
+        analytics.paywallViewed("initial");
+        setPaywallOpen(true);
+      },
+      openReturnPaywall: () => {
+        analytics.paywallViewed("return");
+        setReturnOpen(true);
+      },
       openGate,
       refetchSubscription,
       signOut,

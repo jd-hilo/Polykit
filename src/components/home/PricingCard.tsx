@@ -47,7 +47,7 @@ export function PricingCard() {
             <span className="text-2xl font-semibold text-muted-foreground">first month</span>
             <span className="mb-1 rounded-full bg-[#dcfce7] px-2 py-0.5 text-xs font-semibold text-[#166534]">then $39/mo</span>
           </div>
-          <button onClick={openAuth} className="btn-primary btn-primary-md mt-6 w-full">
+          <button onClick={() => openAuth("pricing")} className="btn-primary btn-primary-md mt-6 w-full">
             Start for $1 <span>→</span>
           </button>
           <div className="mt-5 flex items-center justify-center gap-3 text-xs">

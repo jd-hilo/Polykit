@@ -1,5 +1,6 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { analytics } from "@/lib/analytics";
 
 const FAKE_ROWS = [
   { w: "65%", tag: "YES", pnl: "+$312.40", green: true },
@@ -27,9 +28,15 @@ export function GatedScreen({ featureName }: { featureName: string }) {
     sub: `Unlock ${featureName} and every other Polykit tool for one flat price.`,
   };
 
+  useEffect(() => {
+    analytics.featureGated(featureName);
+    analytics.paywallViewed("gated", featureName);
+  }, [featureName]);
+
   async function handleCheckout() {
     try {
       setLoading(true);
+      analytics.checkoutStarted("gated_screen");
       if (typeof window !== "undefined") localStorage.setItem("ps_checkout_started", "1");
       const cancelPath = typeof window !== "undefined"
         ? window.location.pathname + window.location.search

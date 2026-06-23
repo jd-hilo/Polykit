@@ -13,7 +13,7 @@ export function TrustCTA({ label = "Start winning today" }: { label?: string }) 
   const { openAuth } = useAuth();
   return (
     <div className="flex flex-col items-center gap-5 py-8">
-      <button onClick={openAuth} className="btn-primary btn-primary-lg group">
+      <button onClick={() => openAuth("trust_cta")} className="btn-primary btn-primary-lg group">
         {label} <span className="transition group-hover:translate-x-1">→</span>
       </button>
       <div className="flex flex-col items-center gap-2">

@@ -39,7 +39,7 @@ export function FAQ() {
             <div className="text-lg font-bold">Ready to start winning?</div>
             <div className="text-sm text-muted-foreground">Stop guessing. Start winning.</div>
           </div>
-          <button onClick={openAuth} className="btn-primary btn-primary-md shrink-0">
+          <button onClick={() => openAuth("faq")} className="btn-primary btn-primary-md shrink-0">
             Start winning today <span>→</span>
           </button>
         </div>

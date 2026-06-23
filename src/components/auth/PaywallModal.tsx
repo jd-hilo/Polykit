@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Modal } from "./Modal";
+import { analytics } from "@/lib/analytics";
 
 const INITIAL_SECONDS = 10 * 60;
 
@@ -19,6 +20,7 @@ export function PaywallModal({ open, onClose }: { open: boolean; onClose: () => 
   async function handleCheckout() {
     try {
       setLoading(true);
+      analytics.checkoutStarted("paywall_modal");
       const cancelPath = typeof window !== "undefined"
         ? window.location.pathname + window.location.search
         : "/dashboard";
@@ -46,8 +48,13 @@ export function PaywallModal({ open, onClose }: { open: boolean; onClose: () => 
   const mm = String(Math.floor(remaining / 60)).padStart(2, "0");
   const ss = String(remaining % 60).padStart(2, "0");
 
+  function handleClose() {
+    analytics.paywallDismissed("initial");
+    onClose();
+  }
+
   return (
-    <Modal open={open} onClose={onClose} className="max-w-md border-2 border-[#bfdbfe] bg-[#eff6ff] p-3 md:p-4">
+    <Modal open={open} onClose={handleClose} className="max-w-md border-2 border-[#bfdbfe] bg-[#eff6ff] p-3 md:p-4">
       <div className="space-y-4">
         {/* Top card */}
         <div className="rounded-[24px] bg-white p-7">

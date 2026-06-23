@@ -3,6 +3,7 @@ import { Inbox, Search, TrendingUp, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { GatedScreen } from "@/components/auth/GatedScreen";
+import { analytics } from "@/lib/analytics";
 
 type SearchResult = {
   question: string;
@@ -150,7 +151,10 @@ export default function PaperTrading() {
 
   async function closePosition(id: string) {
     const res = await fetch(`/api/positions/${id}/close`, { method: "PUT" });
-    if (res.ok) loadPositions();
+    if (res.ok) {
+      analytics.positionClosed({ position_id: id });
+      loadPositions();
+    }
   }
 
   const balance = data?.balance ?? 100000;
@@ -725,6 +729,11 @@ function InlineTradeEntry({
         setErr(data?.error ?? "Failed to create position");
         return;
       }
+      analytics.positionOpened({
+        side,
+        stake: stakeNum,
+        market_slug: selected.marketSlug,
+      });
       onSubmitted();
     } finally {
       setBusy(false);

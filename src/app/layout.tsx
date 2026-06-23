@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { AuthProvider } from "@/components/auth/AuthProvider";
+import { PostHogProvider } from "@/components/analytics/PostHogProvider";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://polykit.co";
 
@@ -42,7 +43,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <ClerkProvider>
       <html lang="en">
         <body>
-          <AuthProvider>{children}</AuthProvider>
+          <PostHogProvider>
+            <AuthProvider>{children}</AuthProvider>
+          </PostHogProvider>
         </body>
       </html>
     </ClerkProvider>

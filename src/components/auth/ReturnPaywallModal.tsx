@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { Modal } from "./Modal";
+import { analytics } from "@/lib/analytics";
 
 export function ReturnPaywallModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [loading, setLoading] = useState(false);
@@ -8,6 +9,7 @@ export function ReturnPaywallModal({ open, onClose }: { open: boolean; onClose: 
   async function handleCheckout() {
     try {
       setLoading(true);
+      analytics.checkoutStarted("return_paywall");
       if (typeof window !== "undefined") {
         localStorage.setItem("ps_checkout_started", "1");
       }
@@ -30,8 +32,13 @@ export function ReturnPaywallModal({ open, onClose }: { open: boolean; onClose: 
     }
   }
 
+  function handleClose() {
+    analytics.paywallDismissed("return");
+    onClose();
+  }
+
   return (
-    <Modal open={open} onClose={onClose} className="max-w-md">
+    <Modal open={open} onClose={handleClose} className="max-w-md">
       <div style={{ textAlign: "center" }}>
         <h2
           style={{
@@ -92,7 +99,7 @@ export function ReturnPaywallModal({ open, onClose }: { open: boolean; onClose: 
         </button>
 
         <button
-          onClick={onClose}
+          onClick={handleClose}
           style={{
             marginTop: 12,
             background: "transparent",

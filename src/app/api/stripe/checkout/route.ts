@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
+import { getPostHogClient } from "@/lib/posthog-server";
 
 export const runtime = "nodejs";
 
@@ -132,6 +133,13 @@ export async function POST(req: NextRequest) {
     console.error("[checkout] Whop response missing purchase_url: %j", session);
     return NextResponse.json({ error: "Invalid checkout response" }, { status: 502 });
   }
+
+  const posthog = getPostHogClient();
+  posthog?.capture({
+    distinctId: userId,
+    event: "checkout_session_created",
+    properties: { plan_id: planId },
+  });
 
   return NextResponse.json({ url: session.purchase_url });
 }

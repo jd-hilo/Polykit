@@ -31,7 +31,7 @@ export function Hero() {
             Your all in one tool for making money on Polymarket, Kalshi &amp; other prediction markets with the power of AI
           </p>
           <div className="mt-10 flex justify-center">
-            <button onClick={openAuth} className="btn-hero group">
+            <button onClick={() => openAuth("hero")} className="btn-hero group">
               Get My Winning Edge
               <span className="transition group-hover:translate-x-1">→</span>
             </button>

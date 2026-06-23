@@ -3,6 +3,7 @@ import { Search, TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { GatedScreen } from "@/components/auth/GatedScreen";
+import { analytics } from "@/lib/analytics";
 
 type Position = {
   proxyWallet: string;
@@ -65,10 +66,13 @@ export default function WalletTracker() {
       );
       const data = await res.json().catch(() => null);
       if (!res.ok || !data) {
+        analytics.walletLookup({ position_count: 0, success: false });
         setError(data?.error ?? "Failed to load positions");
         return;
       }
-      setPositions(Array.isArray(data.positions) ? data.positions : []);
+      const rows = Array.isArray(data.positions) ? data.positions : [];
+      analytics.walletLookup({ position_count: rows.length, success: true });
+      setPositions(rows);
     } catch {
       setError("Network error — try again");
     } finally {

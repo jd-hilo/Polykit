@@ -3,6 +3,7 @@ import { Send, Trash2, ExternalLink, Loader2, ChevronDown, History } from "lucid
 import { useEffect, useMemo, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { analytics } from "@/lib/analytics";
 
 type Prompt = { label: string; prompt: string };
 
@@ -199,6 +200,12 @@ export default function AICoach() {
       { id: tempId, role: "user", content: trimmed, display: displayOverride },
     ]);
     setInput("");
+
+    analytics.coachMessageSent({
+      is_preset: Boolean(displayOverride),
+      label: displayOverride,
+      has_positions: hasPositions,
+    });
 
     try {
       const res = await fetch("/api/coach", {

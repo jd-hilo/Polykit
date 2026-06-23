@@ -30,7 +30,7 @@ export function ProfitCalculator() {
           <span className="rounded-xl bg-[#dcfce7] px-4 py-1 font-bold text-[#166534]">${profit.toLocaleString()}</span>
         </div>
 
-        <button onClick={openAuth} className="btn-primary btn-primary-sm mt-8 w-full">
+        <button onClick={() => openAuth("profit_calculator")} className="btn-primary btn-primary-sm mt-8 w-full">
           Claim your profit now <span>→</span>
         </button>
       </div>

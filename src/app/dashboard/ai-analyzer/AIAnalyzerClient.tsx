@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/components/auth/AuthProvider";
+import { analytics } from "@/lib/analytics";
 import type {
   AnalyzerResponse,
   AnalyzerResult,
@@ -184,6 +185,7 @@ export default function AIAnalyzerClient() {
 
   async function handleStripeCheckout() {
     try {
+      analytics.checkoutStarted("analyzer_upsell");
       if (typeof window !== "undefined") localStorage.setItem("ps_checkout_started", "1");
       const cancelPath = typeof window !== "undefined"
         ? window.location.pathname + window.location.search
@@ -216,6 +218,7 @@ export default function AIAnalyzerClient() {
     }
 
     setStage("loading");
+    analytics.analysisStarted({ mode, effort, has_access: hasAccess });
     try {
       const res = await fetch("/api/analyze", { method: "POST", body: fd });
       const data: AnalyzerResponse = await res.json().catch(() => ({
@@ -223,14 +226,27 @@ export default function AIAnalyzerClient() {
         error: "Invalid response from server",
       }));
       if (!data.ok) {
+        analytics.analysisFailed({ mode, error: data.error || "Analyzer failed" });
         setError(data.error || "Analyzer failed");
         setStage("error");
         return;
       }
+      analytics.analysisCompleted({
+        mode,
+        effort,
+        has_access: hasAccess,
+        tier: data.result.tier,
+        pick: data.result.pick,
+        edge: data.result.edge,
+        confidence: data.result.confidence,
+        sibling_count: data.result.siblings.length,
+      });
       setResult(data.result);
       setStage("result");
     } catch (e) {
-      setError((e as Error)?.message || "Network error");
+      const message = (e as Error)?.message || "Network error";
+      analytics.analysisFailed({ mode, error: message });
+      setError(message);
       setStage("error");
     }
   }
