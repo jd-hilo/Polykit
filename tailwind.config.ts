@@ -33,6 +33,11 @@ const config: Config = {
         fadeIn: { "0%": { opacity: "0", transform: "translateY(6px)" }, "100%": { opacity: "1", transform: "translateY(0)" } },
         starFloat: { "0%,100%": { transform: "translateY(0) scale(1)", opacity: "0.6" }, "50%": { transform: "translateY(-10px) scale(1.2)", opacity: "1" } },
         ping: { "75%,100%": { transform: "scale(2)", opacity: "0" } },
+        auroraDrift: {
+          "0%,100%": { transform: "translate(0,0) scale(1)" },
+          "33%": { transform: "translate(6%,-8%) scale(1.18)" },
+          "66%": { transform: "translate(-5%,5%) scale(0.9)" },
+        },
       },
       animation: {
         shimmer: "shimmerSweep 2.5s ease-in-out infinite",
@@ -40,6 +45,7 @@ const config: Config = {
         "fade-in": "fadeIn 0.4s ease-out",
         "star-float": "starFloat 4s ease-in-out infinite",
         "ping-slow": "ping 2s cubic-bezier(0,0,0.2,1) infinite",
+        aurora: "auroraDrift 18s ease-in-out infinite",
       },
       backgroundImage: {
         "hero-gradient": "linear-gradient(180deg, #dbeafe 0%, #eff6ff 40%, #ffffff 100%)",

@@ -59,10 +59,12 @@ model Position {
 
 model WaitlistEntry {
   id        String   @id @default(uuid()) @db.Uuid
-  userId    String   @map("user_id")
+  // Nullable so anonymous visitors can join the public launch waitlist.
+  userId    String?  @map("user_id")
   email     String
   feature   String
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  @@unique([email, feature])
   @@map("waitlist_entries")
 }
 

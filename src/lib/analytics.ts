@@ -66,4 +66,8 @@ export const analytics = {
   walletLookup(props: { position_count: number; success: boolean }) {
     capture("wallet_lookup", props);
   },
+
+  launchWaitlistJoined(props: { source: string }) {
+    capture("launch_waitlist_joined", props);
+  },
 };

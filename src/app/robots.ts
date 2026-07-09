@@ -53,12 +53,27 @@ const AI_AGENTS = [
   "PetalBot",
 ];
 
-const DISALLOWED_PATHS = [
-  "/api/",
-  "/dashboard/",
-  "/sign-in",
-  "/sign-up",
-];
+const COMING_SOON = process.env.COMING_SOON === "1";
+
+const DISALLOWED_PATHS = COMING_SOON
+  ? [
+      // Coming-soon mode: only /, /contact, /privacy, /terms are crawlable.
+      // /coming-soon is disallowed so / stays the one canonical teaser URL.
+      "/api/",
+      "/dashboard/",
+      "/sign-in",
+      "/sign-up",
+      "/about",
+      "/pricing",
+      "/blog",
+      "/coming-soon",
+    ]
+  : [
+      "/api/",
+      "/dashboard/",
+      "/sign-in",
+      "/sign-up",
+    ];
 
 export default function robots(): MetadataRoute.Robots {
   return {
