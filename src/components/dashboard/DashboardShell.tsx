@@ -1,28 +1,18 @@
 "use client";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import {
-  Home,
-  Key,
-  Activity,
-  Settings,
-  Plug,
-} from "lucide-react";
+import { Home, Activity, Settings } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useEffect } from "react";
 import { UserButton, useUser } from "@clerk/nextjs";
 
 const NAV = [
-  { href: "/dashboard", icon: Home, label: "Overview" },
-  { href: "/dashboard/setup", icon: Plug, label: "Setup" },
-  { href: "/dashboard/keys", icon: Key, label: "API Keys" },
+  { href: "/dashboard", icon: Home, label: "Get connected" },
   { href: "/dashboard/usage", icon: Activity, label: "Usage" },
   { href: "/dashboard/settings", icon: Settings, label: "Settings" },
 ];
 
 const PAGE_HEADERS: Record<string, { title: string; icon: LucideIcon }> = {
-  "/dashboard/setup": { title: "Setup", icon: Plug },
-  "/dashboard/keys": { title: "API Keys", icon: Key },
   "/dashboard/usage": { title: "Usage", icon: Activity },
   "/dashboard/settings": { title: "Settings", icon: Settings },
 };

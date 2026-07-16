@@ -60,7 +60,7 @@ const mcpHandler = createMcpHandler(
             content: [
               {
                 type: "text" as const,
-                text: `Unauthorized. Get an API key at ${SITE_URL}/dashboard/keys`,
+                text: `Unauthorized. Get a connection key at ${SITE_URL}/dashboard`,
               },
             ],
             isError: true,

@@ -8,7 +8,7 @@ const INITIAL_SECONDS = 10 * 60;
 const FEATURES: [string, string][] = [
   ["Polykit MCP Server", "Streamable HTTP at /api/mcp"],
   ["analyze_market Tool", "URL, slug, or screenshot → edge analysis"],
-  ["API Keys", "Bearer auth for Claude and ChatGPT connectors"],
+  ["Connection key", "Lets Claude and ChatGPT call Polykit"],
   ["Usage Dashboard", "track every MCP call from your dashboard"],
 ];
 
