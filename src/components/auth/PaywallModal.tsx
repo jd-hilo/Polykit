@@ -6,10 +6,10 @@ import { analytics } from "@/lib/analytics";
 const INITIAL_SECONDS = 10 * 60;
 
 const FEATURES: [string, string][] = [
-  ["Instant Full Access", "to the full Polykit platform"],
-  ["AI Market Analyzer", "screenshot any market for instant edge analysis"],
-  ["Paper Trading", "simulate with $100k virtual balance"],
-  ["AI Coach", "live-cited strategy advice with specific picks"],
+  ["Polykit MCP Server", "Streamable HTTP at /api/mcp"],
+  ["analyze_market Tool", "URL, slug, or screenshot → edge analysis"],
+  ["API Keys", "Bearer auth for Claude and ChatGPT connectors"],
+  ["Usage Dashboard", "track every MCP call from your dashboard"],
 ];
 
 
@@ -65,9 +65,9 @@ export function PaywallModal({ open, onClose }: { open: boolean; onClose: () => 
                 <polyline points="3 17 9 11 13 15 21 7" /><polyline points="15 7 21 7 21 13" />
               </svg>
             </span>
-            <div className="text-3xl font-extrabold tracking-tight">All-Access</div>
+            <div className="text-3xl font-extrabold tracking-tight">MCP Access</div>
           </div>
-          <p className="mt-3 text-sm text-muted-foreground">You&apos;re getting instant access to the complete Polykit platform.</p>
+          <p className="mt-3 text-sm text-muted-foreground">Connect Claude and ChatGPT to Polykit&apos;s Polymarket analysis MCP.</p>
 
           {/* Price */}
           <div className="mt-5 flex items-end gap-3">

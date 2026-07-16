@@ -100,7 +100,7 @@ function TradeStrategiesCard() {
         </div>
 
         <a href="#pricing" className="btn-primary btn-primary-sm mt-6 inline-flex">
-          Join Waitlist →
+          Get API access →
         </a>
       </div>
     </div>

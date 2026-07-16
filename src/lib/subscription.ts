@@ -15,7 +15,7 @@ const STALE_CACHE_MS = 24 * 60 * 60 * 1000; // 24h
  * future (or null, indicating no expiry).
  *
  * Flow:
- *   1. Dev bypass (only when DEV_UNLOCK_SUBSCRIPTION ≠ "0" in non-prod).
+ *   1. Dev bypass when ALL_PREM=1 or DEV_UNLOCK_SUBSCRIPTION=1 (non-prod only).
  *   2. Look up subscriptions row keyed by Clerk userId — fast path (~5ms).
  *      Webhook keeps this row in sync, so this should be authoritative.
  *   2a. If that row is more than 24h old, re-verify with Whop's live API
@@ -30,10 +30,12 @@ export async function isUserSubscribed(
 ): Promise<boolean> {
   if (!userId) return false;
 
-  // Dev bypass — only outside production, and only if explicitly enabled.
+  // Dev / demo unlock — opt-in only, never in production.
   if (
     process.env.NODE_ENV !== "production" &&
-    process.env.DEV_UNLOCK_SUBSCRIPTION !== "0"
+    (process.env.ALL_PREM === "1" ||
+      process.env.ALL_PREM === "true" ||
+      process.env.DEV_UNLOCK_SUBSCRIPTION === "1")
   ) {
     return true;
   }
@@ -99,12 +101,27 @@ export async function isUserSubscribed(
   //   • First purchase before webhook fires
   //   • Webhook failures
   //   • Users created in Whop manually
-  let email: string | null = null;
-  try {
-    const user = await currentUser();
-    email = user?.primaryEmailAddress?.emailAddress ?? null;
-  } catch {
-    return false;
+  let email: string | null = cached?.email ?? null;
+  if (!email) {
+    try {
+      const user = await currentUser();
+      email = user?.primaryEmailAddress?.emailAddress ?? null;
+    } catch {
+      return false;
+    }
+  }
+  if (!email) {
+    // Last resort: read email from any subscription row for this userId
+    // (supports API-key auth paths without a Clerk session).
+    try {
+      const row = await prisma.subscription.findUnique({
+        where: { userId },
+        select: { email: true },
+      });
+      email = row?.email ?? null;
+    } catch {
+      return false;
+    }
   }
   if (!email) return false;
 

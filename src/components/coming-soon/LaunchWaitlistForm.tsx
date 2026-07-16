@@ -37,7 +37,7 @@ export default function LaunchWaitlistForm() {
   if (status === "success") {
     return (
       <div className="mx-auto inline-flex items-center justify-center gap-2 rounded-[14px] border border-white bg-white px-8 py-3.5 text-base font-semibold text-[#235ae9] shadow-[rgba(6,35,84,0.3)_0_2px_8px_0]">
-        You&apos;re on the list — talk soon 🎉
+        You&apos;re on the list — we&apos;ll email you when MCP access opens.
       </div>
     );
   }
@@ -66,7 +66,7 @@ export default function LaunchWaitlistForm() {
           className="min-w-0 flex-1 rounded-[14px] border border-white/60 bg-white/95 px-5 py-3 text-base font-medium text-[#0f172a] placeholder-slate-400 shadow-[rgba(6,35,84,0.15)_0_2px_8px_0] outline-none transition focus:border-white focus:ring-2 focus:ring-white/60"
         />
         <button type="submit" disabled={status === "loading"} className="btn-hero shrink-0">
-          {status === "loading" ? "Joining…" : "Notify me"}
+          {status === "loading" ? "Joining…" : "Get early access"}
           <span aria-hidden="true">→</span>
         </button>
       </div>

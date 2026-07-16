@@ -104,3 +104,30 @@ model CoachMessage {
   @@index([userId, createdAt])
   @@map("coach_messages")
 }
+
+model ApiKey {
+  id         String    @id @default(uuid()) @db.Uuid
+  userId     String    @map("user_id")
+  name       String    @default("Default")
+  keyPrefix  String    @map("key_prefix")
+  keyHash    String    @unique @map("key_hash")
+  lastUsedAt DateTime? @map("last_used_at") @db.Timestamptz
+  revokedAt  DateTime? @map("revoked_at") @db.Timestamptz
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  @@index([userId])
+  @@map("api_keys")
+}
+
+model McpToolCall {
+  id           String   @id @default(uuid()) @db.Uuid
+  userId       String   @map("user_id")
+  apiKeyId     String?  @map("api_key_id") @db.Uuid
+  tool         String
+  status       String   // ok | error
+  latencyMs    Int?     @map("latency_ms")
+  inputSummary String?  @map("input_summary")
+  errorMessage String?  @map("error_message")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
+  @@index([userId, createdAt])
+  @@map("mcp_tool_calls")
+}

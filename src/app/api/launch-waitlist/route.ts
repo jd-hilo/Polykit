@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 export const runtime = "nodejs";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const LAUNCH_FEATURE = "launch";
+const LAUNCH_FEATURE = "mcp";
 
 // Best-effort per-IP throttle. Serverless caveat: memory is per-instance and
 // resets on cold start, so this is a speed bump rather than a hard limit.
