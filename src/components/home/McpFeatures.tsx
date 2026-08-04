@@ -21,10 +21,10 @@ const FEATURES = [
 ];
 
 const PROOF = [
-  { value: "$35,021", label: "Won with Polykit" },
   { value: "<10s", label: "To a clear verdict" },
-  { value: "$1", label: "To try it" },
-  { value: "2 min", label: "To get live" },
+  { value: "Any market", label: "Link or screenshot" },
+  { value: "2 apps", label: "Claude & ChatGPT" },
+  { value: "2 min", label: "To connect" },
 ];
 
 export function McpFeatures() {
@@ -78,13 +78,13 @@ export function McpFeatures() {
           <div aria-hidden className="supaste-banner absolute inset-0" />
           <div className="relative flex flex-wrap items-center justify-between gap-x-4 gap-y-3 px-5 py-4 md:px-6">
             <p className="text-[15px] font-semibold text-white md:text-[16px]">
-              Try the full product for $1
+              Analyze Polymarket inside Claude and ChatGPT
               <span className="font-normal text-white/80">
                 {" "}
-                · Unlimited analysis · Claude + ChatGPT · Cancel anytime
+                · Unlimited analysis · Cancel anytime
               </span>
             </p>
-            <StartCta location="features_cta" className="btn-hero shrink-0" showArrow onDark />
+            <StartCta location="features_cta" label="Connect Polykit" className="btn-hero shrink-0" showArrow onDark />
           </div>
         </div>
       </div>

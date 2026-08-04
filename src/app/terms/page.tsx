@@ -93,7 +93,7 @@ export default function Terms() {
           <h2 className="mt-10 text-2xl font-bold">6. Subscriptions, Billing, and Refunds</h2>
           <p>
             Paid features are offered on a recurring subscription basis (for
-            example, $39 per month). Fees are billed in advance for the
+            example, $14 per month). Fees are billed in advance for the
             applicable period and are non-refundable except where required by
             law. You may cancel at any time; cancellation takes effect at the
             end of the current billing period. Introductory promotions, trials,

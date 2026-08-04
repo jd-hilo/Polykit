@@ -114,8 +114,8 @@ export default function SettingsPage() {
           label={hasAccess ? "Polykit MCP · Active" : "Upgrade to MCP access"}
           value={
             hasAccess
-              ? "$1 first month, then $39/mo"
-              : "$1 first month, then $39/mo"
+              ? "$14/mo · first month $1"
+              : "$14/mo · first month $1"
           }
           chevron={false}
         />
@@ -160,7 +160,7 @@ export default function SettingsPage() {
               className="btn-primary btn-primary-sm mt-1 w-full"
               disabled={billingLoading}
             >
-              {billingLoading ? "Redirecting…" : "Start for $1 →"}
+              {billingLoading ? "Redirecting…" : "Get started →"}
             </button>
           </div>
         )}

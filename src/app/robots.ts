@@ -79,5 +79,6 @@ export default function robots(): MetadataRoute.Robots {
     ],
     sitemap: `${SITE_URL}/sitemap.xml`,
     host: SITE_URL,
+    // Note: also publish https://polykit.co/llms.txt and /llms-full.txt for AI agents.
   };
 }

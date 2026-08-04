@@ -10,15 +10,19 @@ const DEMO_LIGHT =
 const DEMO_ON_DARK =
   "inline-flex items-center rounded-full border border-white/30 bg-white/15 px-3.5 py-2 text-[13px] font-semibold text-white backdrop-blur-sm transition hover:bg-white/25";
 
-/** CTA: "Start for $1" for prospects, "Open dashboard" when subscribed.
- *  When NEXT_PUBLIC_ALL_PREM=1, also shows a Demo shortcut beside it. */
+/** CTA: product-led label for prospects, "Open dashboard" when subscribed.
+ *  Pass `label` to vary the wording per section. When NEXT_PUBLIC_ALL_PREM=1,
+ *  also shows a Demo shortcut beside it. */
 export function StartCta({
   location,
+  label = "Add Polykit to Claude",
   className = "btn-primary btn-primary-sm",
   showArrow = false,
   onDark = false,
 }: {
   location: string;
+  /** Prospect-facing button text. Vary per section; never lead with the price. */
+  label?: string;
   className?: string;
   showArrow?: boolean;
   /** Use light text Demo button (nav / hero / blue banners). */
@@ -29,7 +33,7 @@ export function StartCta({
   return (
     <span className="inline-flex items-center gap-2">
       <button type="button" onClick={() => openAuth(location)} className={className}>
-        {hasAccess ? "Open dashboard" : "Start for $1"}
+        {hasAccess ? "Open dashboard" : label}
         {showArrow ? (
           <span className="transition group-hover:translate-x-0.5">→</span>
         ) : null}

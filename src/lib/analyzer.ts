@@ -1,5 +1,5 @@
 // Shared types for the AI analyzer feature.
-// Matches the polifly_clone_brief.md analyze-market response schema.
+// Response schema for the analyze_market tool (fair value, edge, recommendation).
 
 export type AnalyzerPick = "Yes" | "No";
 export type AnalyzerAction = "BUY" | "SELL" | "PASS";

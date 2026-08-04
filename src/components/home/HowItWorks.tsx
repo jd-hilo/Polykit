@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { StartCta } from "@/components/auth/StartCta";
 import { Key, Plug, Sparkles } from "lucide-react";
 
@@ -9,12 +10,12 @@ const STEPS = [
   {
     icon: Key,
     title: "Get access",
-    body: "Subscribe for $1 and create your API key in the dashboard.",
+    body: "Subscribe and create your connection key in the dashboard.",
   },
   {
     icon: Plug,
     title: "Connect once",
-    body: "Add Polykit to Claude, ChatGPT, or any MCP client. Takes about two minutes.",
+    body: "Add Polykit to ChatGPT, Claude, or any MCP client. Takes about two minutes.",
   },
   {
     icon: Sparkles,
@@ -33,8 +34,12 @@ export function HowItWorks() {
             Live in under two minutes
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-[16px] leading-relaxed text-[#525252]">
-            Subscribe, grab a key, paste one config block. Full connector guides are in your
-            dashboard after signup.
+            Subscribe, grab a key, paste one config block. Full ChatGPT and Claude guides are on
+            the{" "}
+            <Link href="/mcp" className="font-medium text-[#006fff] hover:underline">
+              MCP setup page
+            </Link>
+            .
           </p>
         </div>
 
@@ -48,7 +53,7 @@ export function HowItWorks() {
                 <span className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-[#0080ff] to-[#5f61ed] text-white">
                   <Icon size={16} />
                 </span>
-                <span className="font-mono text-xs text-[#a3a3a3]">0{i + 1}</span>
+                <span className="text-xs text-[#a3a3a3]">0{i + 1}</span>
               </div>
               <h3 className="mt-4 text-lg font-semibold tracking-[-0.01em] text-[#0d0d0d]">
                 {title}
@@ -61,11 +66,9 @@ export function HowItWorks() {
         <div className="mt-8 flex flex-col items-center gap-3 rounded-2xl border border-[#e3e3e3] bg-white px-6 py-5 shadow-sm sm:flex-row sm:justify-between">
           <div className="text-center sm:text-left">
             <p className="text-sm font-medium text-[#0d0d0d]">Endpoint</p>
-            <code className="font-mono text-[13px] text-[#525252]">
-              {MCP_URL.replace("https://", "")}
-            </code>
+            <code className="text-[13px] text-[#525252]">{MCP_URL.replace("https://", "")}</code>
           </div>
-          <StartCta location="setup_cta" className="btn-primary btn-primary-md" showArrow />
+          <StartCta location="setup_cta" label="Connect Polykit" className="btn-primary btn-primary-md" showArrow />
         </div>
       </div>
     </section>

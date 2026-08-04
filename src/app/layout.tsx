@@ -15,28 +15,35 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://polykit.co";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: "Polykit — Turn Claude into a Polymarket Trading Expert",
+  title: {
+    default: "Polykit — Polymarket MCP for ChatGPT & Claude",
+    template: "%s | Polykit",
+  },
   description:
-    "Connect Polykit as a custom MCP. Claude and ChatGPT analyze any Polymarket market for fair value, edge, and BUY/SELL/PASS recommendations.",
+    "Connect Polykit as a custom MCP. ChatGPT and Claude analyze any Polymarket market for fair value, edge, and BUY/SELL/PASS recommendations.",
   applicationName: "Polykit",
   keywords: [
     "Polymarket MCP",
-    "Claude MCP",
+    "ChatGPT Polymarket",
+    "Claude Polymarket",
     "ChatGPT MCP",
+    "Claude MCP",
     "prediction market AI",
+    "Polymarket analysis",
     "Polykit",
   ],
   openGraph: {
     type: "website",
     url: SITE_URL,
     siteName: "Polykit",
-    title: "Polykit — Turn Claude into a Polymarket Trading Expert",
-    description: "Headless MCP for Polymarket analysis inside Claude and ChatGPT.",
+    title: "Polykit — Polymarket MCP for ChatGPT & Claude",
+    description:
+      "Headless MCP for Polymarket analysis inside ChatGPT and Claude. Fair value, edge, and clear recommendations.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Polykit — Polymarket MCP",
-    description: "Turn Claude into a Polymarket trading expert with Polykit MCP.",
+    title: "Polykit — Polymarket MCP for ChatGPT & Claude",
+    description: "Analyze any Polymarket market inside ChatGPT or Claude with Polykit MCP.",
   },
   alternates: { canonical: SITE_URL },
 };

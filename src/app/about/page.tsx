@@ -7,7 +7,7 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://polykit.co";
 export const metadata: Metadata = {
   title: "About Polykit",
   description:
-    "Polykit is a headless MCP server for Polymarket analysis. Independent third-party tool — not affiliated with Polymarket.",
+    "Polykit is a headless MCP server for Polymarket analysis in ChatGPT and Claude. Independent third-party tool — not affiliated with Polymarket.",
   alternates: { canonical: `${SITE_URL}/about` },
 };
 

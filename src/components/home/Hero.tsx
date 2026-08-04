@@ -51,26 +51,10 @@ export function Hero() {
             transform: visible ? "translateY(0)" : "translateY(12px)",
           }}
         >
-          <div className="supaste-glass mx-auto inline-flex items-center gap-2.5 rounded-full px-3.5 py-1.5">
-            <div className="flex -space-x-2">
-              {[
-                "/social_proof_candid/01_ferrari_night_lean.jpg",
-                "/social_proof_candid/04_hoodie_sports_car_garage.jpg",
-                "/social_proof_candid/14_private_jet_champagne.jpg",
-                "/social_proof_candid/09_lambo_yellow_london.jpg",
-              ].map((src, i) => (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  key={src}
-                  src={src}
-                  alt=""
-                  className="h-6 w-6 rounded-full border-2 border-white/60 object-cover"
-                  style={{ zIndex: 4 - i }}
-                />
-              ))}
-            </div>
+          <div className="supaste-glass mx-auto inline-flex items-center gap-2 rounded-full px-3.5 py-1.5">
+            <Link2 size={13} className="text-white" />
             <p className="text-[13px] font-medium text-white">
-              <span className="font-semibold tabular-nums">$35,021</span> won with Polykit
+              A Polymarket MCP for Claude &amp; ChatGPT
             </p>
           </div>
 
@@ -97,13 +81,14 @@ export function Hero() {
           <div className="mt-10 flex flex-col items-center gap-3">
             <StartCta
               location="hero"
+              label="Add Polykit to Claude"
               className="btn-hero group text-[16px]"
               showArrow
               onDark
             />
             {!hasAccess && (
               <p className="text-[13px] font-medium text-white/90">
-                Then $39/mo. Cancel anytime.
+                $14/month. Cancel anytime. First month $1.
               </p>
             )}
           </div>
@@ -181,9 +166,14 @@ function SampleResult() {
   return (
     <div className="grid md:grid-cols-2">
       <div className="border-b border-[#ececec] p-6 md:border-b-0 md:border-r md:p-8">
-        <p className="font-mono text-[11px] uppercase tracking-wider text-[#a3a3a3]">
-          Polykit returns
-        </p>
+        <div className="flex items-center justify-between gap-2">
+          <p className="font-mono text-[11px] uppercase tracking-wider text-[#a3a3a3]">
+            Polykit returns
+          </p>
+          <span className="rounded-full bg-[#f2f2f2] px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-[#8a8a8a]">
+            Illustrative example
+          </span>
+        </div>
         <p className="mt-2 text-[15px] font-semibold leading-snug text-[#0d0d0d]">
           Will the US enter a recession in 2026?
         </p>

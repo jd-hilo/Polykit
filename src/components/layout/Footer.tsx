@@ -14,6 +14,16 @@ export function Footer() {
         <div className="flex gap-16 text-sm">
           <ul className="space-y-2.5">
             <li>
+              <Link href="/mcp" className="footer-link">
+                MCP setup
+              </Link>
+            </li>
+            <li>
+              <Link href="/pricing" className="footer-link">
+                Pricing
+              </Link>
+            </li>
+            <li>
               <Link href="/dashboard" className="footer-link">
                 Dashboard
               </Link>
@@ -39,6 +49,11 @@ export function Footer() {
               <Link href="/blog" className="footer-link">
                 Blog
               </Link>
+            </li>
+            <li>
+              <a href="/llms.txt" className="footer-link">
+                llms.txt
+              </a>
             </li>
           </ul>
         </div>

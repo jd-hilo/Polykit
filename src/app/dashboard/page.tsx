@@ -17,7 +17,7 @@ type ApiKeyRow = {
   createdAt: string;
 };
 
-type AppId = "claude" | "chatgpt";
+type AppId = "claude" | "chatgpt" | "custom";
 
 function StepBadge({
   n,
@@ -184,7 +184,7 @@ export default function DashboardHome() {
               <p className="mt-1 text-sm text-[#525252]">
                 {step1Done
                   ? "Your subscription is active. You can create a connection key."
-                  : "Start for $1 this month. Then $39/mo. Cancel anytime."}
+                  : "$14/mo, cancel anytime. Your first month is $1."}
               </p>
               {!step1Done && (
                 <button
@@ -192,7 +192,7 @@ export default function DashboardHome() {
                   onClick={() => openAuth("dashboard")}
                   className="btn-primary btn-primary-md mt-4"
                 >
-                  Start for $1 →
+                  Unlock Polykit →
                 </button>
               )}
               {step1Done && (
@@ -278,6 +278,7 @@ export default function DashboardHome() {
                   [
                     ["claude", "Claude"],
                     ["chatgpt", "ChatGPT"],
+                    ["custom", "Custom"],
                   ] as const
                 ).map(([id, label]) => (
                   <button
@@ -302,7 +303,7 @@ export default function DashboardHome() {
                 </p>
               )}
 
-              {app === "claude" ? (
+              {app === "claude" && (
                 <div className="mt-4 space-y-4">
                   <ol className="list-decimal space-y-2 pl-5 text-sm leading-relaxed text-[#525252]">
                     <li>
@@ -327,7 +328,9 @@ export default function DashboardHome() {
                     <CodeBlock code={claudeConfig} label="Paste into Claude" />
                   </div>
                 </div>
-              ) : (
+              )}
+
+              {app === "chatgpt" && (
                 <div className="mt-4 space-y-4">
                   <ol className="list-decimal space-y-2 pl-5 text-sm leading-relaxed text-[#525252]">
                     <li>
@@ -363,6 +366,22 @@ export default function DashboardHome() {
                       <CopyButton value={`Bearer ${freshKey}`} label="Copy header" />
                     </div>
                   )}
+                </div>
+              )}
+
+              {app === "custom" && (
+                <div className="mt-4 space-y-4">
+                  <p className="text-sm leading-relaxed text-[#525252]">
+                    Works with Cursor, VS Code, Cline, or any MCP client. Paste this
+                    into your client&apos;s MCP config, then turn Polykit on.
+                  </p>
+                  <div className="flex flex-wrap items-center gap-2 rounded-xl border border-[#e3e3e3] bg-[#f7f7f7] px-3 py-2.5">
+                    <code className="min-w-0 flex-1 break-all text-[13px] text-[#0d0d0d]">
+                      {MCP_URL}
+                    </code>
+                    <CopyButton value={MCP_URL} />
+                  </div>
+                  <CodeBlock code={claudeConfig} label="mcp.json" />
                 </div>
               )}
             </div>
