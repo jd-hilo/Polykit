@@ -10,11 +10,41 @@ const isMcpRoute = createRouteMatcher([
   "/api/message",
 ]);
 
+// Teaser gate. Set COMING_SOON=1 to send visitors to /coming-soon instead of
+// the marketing site. Unset (or any other value) serves the live product.
+const comingSoon = process.env.COMING_SOON === "1";
+
+// Stays reachable while the teaser is up: paying members keep their dashboard
+// and connection keys, Whop billing webhooks keep firing, and the links in the
+// teaser footer still resolve.
+const bypassesTeaser = createRouteMatcher([
+  "/coming-soon",
+  "/api/(.*)",
+  "/dashboard(.*)",
+  "/sign-in(.*)",
+  "/sign-up(.*)",
+  "/contact",
+  "/privacy",
+  "/terms",
+  // Crawler + agent files must always serve their real contents — a redirect
+  // here means crawlers lose our directives entirely.
+  "/robots.txt",
+  "/sitemap.xml",
+  "/llms.txt",
+  "/llms-full.txt",
+  // MCP clients probe these during auth discovery; never send them to the teaser.
+  "/.well-known/(.*)",
+]);
+
 export default clerkMiddleware(async (auth, req) => {
   const { pathname } = req.nextUrl;
 
-  // Legacy teaser — send to the live MCP landing.
-  if (pathname === "/coming-soon") {
+  if (comingSoon) {
+    if (!bypassesTeaser(req)) {
+      return NextResponse.redirect(new URL("/coming-soon", req.url), 307);
+    }
+  } else if (pathname === "/coming-soon") {
+    // Teaser off — send stragglers to the live MCP landing.
     return NextResponse.redirect(new URL("/", req.url), 307);
   }
 
