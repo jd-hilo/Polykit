@@ -3,11 +3,14 @@ import { NextResponse } from "next/server";
 
 const isProtectedRoute = createRouteMatcher(["/dashboard(.*)"]);
 
-// MCP uses Bearer API keys — never Clerk cookie auth.
+// MCP uses Bearer credentials — never Clerk cookie auth. The OAuth token and
+// registration endpoints are machine-to-machine for the same reason: the client
+// calls them without a browser session.
 const isMcpRoute = createRouteMatcher([
   "/api/mcp",
   "/api/sse",
   "/api/message",
+  "/api/oauth/(.*)",
 ]);
 
 // Teaser gate. Set COMING_SOON=1 to send visitors to /coming-soon instead of
@@ -23,6 +26,9 @@ const bypassesTeaser = createRouteMatcher([
   "/dashboard(.*)",
   "/sign-in(.*)",
   "/sign-up(.*)",
+  // Connector authorization must survive the teaser: a member connecting from
+  // claude.ai lands here mid-OAuth-redirect.
+  "/oauth/(.*)",
   "/contact",
   "/privacy",
   "/terms",

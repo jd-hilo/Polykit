@@ -112,16 +112,37 @@ export function McpSetupGuide({ mcpUrl }: { mcpUrl: string }) {
       )}
 
       {app === "claude" && (
-        <div className="mt-5 space-y-4">
-          <ol className="list-decimal space-y-2 pl-5 text-sm leading-relaxed text-[#525252]">
-            <li>
-              Claude Desktop: <strong>Settings</strong> → <strong>Developer</strong> →{" "}
-              <strong>Edit Config</strong>. Or Claude.ai: <strong>Connectors</strong> →{" "}
-              <strong>Add custom connector</strong>.
-            </li>
-            <li>Paste the config block below (or URL + Bearer header).</li>
-            <li>Restart Claude if needed, enable Polykit, then analyze a Polymarket link.</li>
-          </ol>
+        <div className="mt-5 space-y-5">
+          <div>
+            <p className="text-sm font-semibold text-[#0d0d0d]">Claude.ai (web)</p>
+            <ol className="mt-2 list-decimal space-y-2 pl-5 text-sm leading-relaxed text-[#525252]">
+              <li>
+                <strong>Settings</strong> → <strong>Connectors</strong> →{" "}
+                <strong>Add custom connector</strong>.
+              </li>
+              <li>
+                Name it Polykit and paste the URL below. Leave the OAuth client fields
+                empty.
+              </li>
+              <li>
+                Click <strong>Connect</strong> — you&apos;ll sign in to Polykit and approve
+                access. No connection key needed.
+              </li>
+            </ol>
+            <div className="mt-3 flex flex-wrap items-center gap-2 rounded-xl border border-[#e3e3e3] bg-[#f7f7f7] px-3 py-2.5">
+              <code className="min-w-0 flex-1 break-all text-[13px] text-[#0d0d0d]">{mcpUrl}</code>
+              <CopyButton value={mcpUrl} />
+            </div>
+          </div>
+
+          <div>
+            <p className="text-sm font-semibold text-[#0d0d0d]">Claude Desktop &amp; Claude Code</p>
+            <p className="mt-2 text-sm leading-relaxed text-[#525252]">
+              These support custom headers, so they use a connection key instead:{" "}
+              <strong>Settings</strong> → <strong>Developer</strong> →{" "}
+              <strong>Edit Config</strong>, then paste the block below and restart Claude.
+            </p>
+          </div>
           <CodeBlock code={config} label="Paste into Claude" />
         </div>
       )}

@@ -4,6 +4,8 @@ import {
   authenticateApiKey,
   logMcpToolCall,
 } from "@/lib/api-keys";
+import { ACCESS_TOKEN_PREFIX, authenticateAccessToken } from "@/lib/oauth";
+import { isUserSubscribed } from "@/lib/subscription";
 import {
   dataUrlFromBase64,
   parseEffort,
@@ -178,10 +180,29 @@ const handler = withMcpAuth(
     const header = bearerToken
       ? `Bearer ${bearerToken}`
       : req.headers.get("authorization");
+    const raw = bearerToken ?? header?.replace(/^Bearer\s+/i, "").trim() ?? "";
+
+    // Two credential shapes reach this endpoint. Connection keys (pk_live_…)
+    // are pasted into clients that support custom headers; OAuth access tokens
+    // (pkoa_…) come from clients like claude.ai that can only do OAuth.
+    if (raw.startsWith(ACCESS_TOKEN_PREFIX)) {
+      const oauth = await authenticateAccessToken(raw);
+      if (!oauth) return undefined;
+      // Entitlement is re-checked per call, so a cancellation takes effect
+      // without waiting for the access token to expire.
+      if (!(await isUserSubscribed(oauth.userId))) return undefined;
+      return {
+        token: raw,
+        clientId: oauth.clientId,
+        scopes: [oauth.scope],
+        extra: { userId: oauth.userId },
+      };
+    }
+
     const auth = await authenticateApiKey(header);
     if (!auth) return undefined;
     return {
-      token: bearerToken ?? header?.replace(/^Bearer\s+/i, "") ?? "",
+      token: raw,
       clientId: auth.userId,
       scopes: ["analyze"],
       extra: {
@@ -190,7 +211,13 @@ const handler = withMcpAuth(
       },
     };
   },
-  { required: true, resourceUrl: `${SITE_URL}/api/mcp` },
+  {
+    required: true,
+    resourceUrl: `${SITE_URL}/api/mcp`,
+    // Point the 401 at metadata we actually serve; this pointer previously
+    // resolved to a 404 and dead-ended the claude.ai connect flow.
+    resourceMetadataPath: "/.well-known/oauth-protected-resource",
+  },
 );
 
 export { handler as GET, handler as POST };
