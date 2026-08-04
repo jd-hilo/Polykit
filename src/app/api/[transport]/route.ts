@@ -6,6 +6,8 @@ import {
 } from "@/lib/api-keys";
 import { ACCESS_TOKEN_PREFIX, authenticateAccessToken } from "@/lib/oauth";
 import { isUserSubscribed } from "@/lib/subscription";
+import { buildEvidencePacket } from "@/lib/evidence";
+import { resolvePolymarket, slugFromUrl } from "@/lib/polymarket";
 import {
   dataUrlFromBase64,
   parseEffort,
@@ -160,11 +162,94 @@ const mcpHandler = createMcpHandler(
         };
       },
     );
+
+    server.registerTool(
+      "get_market_evidence",
+      {
+        title: "Get Polymarket evidence",
+        description:
+          "Fetch verified Polymarket data for a market and reason about it yourself. Returns live prices, the full resolution rules, sibling markets, and a step-by-step method. Prefer this over analyze_market when you can search the web: you enumerate which resolution paths are still open from already-published data, which is where a pre-baked verdict most often goes wrong. Fast, and it never guesses at outside figures.",
+        inputSchema: {
+          url: z
+            .string()
+            .optional()
+            .describe("Full Polymarket event or market URL"),
+          slug: z
+            .string()
+            .optional()
+            .describe("Polymarket market or event slug (alternative to url)"),
+        },
+      },
+      async (args, extra) => {
+        const userId = (extra?.authInfo?.extra as { userId?: string } | undefined)?.userId;
+        const apiKeyId = (extra?.authInfo?.extra as { apiKeyId?: string } | undefined)?.apiKeyId;
+
+        if (!userId) {
+          return {
+            content: [
+              {
+                type: "text" as const,
+                text: `Unauthorized. Get a connection key at ${SITE_URL}/dashboard`,
+              },
+            ],
+            isError: true,
+          };
+        }
+
+        const start = Date.now();
+        const rawInput = args.url?.trim() || args.slug?.trim() || "";
+        const inputSummary = rawInput.slice(0, 200);
+
+        const fail = async (message: string) => {
+          await logMcpToolCall({
+            userId,
+            apiKeyId,
+            tool: "get_market_evidence",
+            status: "error",
+            latencyMs: Date.now() - start,
+            inputSummary,
+            errorMessage: message,
+          });
+          return {
+            content: [{ type: "text" as const, text: message }],
+            isError: true,
+          };
+        };
+
+        if (!rawInput) return fail("Provide a Polymarket url or slug.");
+
+        const slug = slugFromUrl(rawInput) ?? rawInput;
+        let snapshot = null;
+        try {
+          snapshot = await resolvePolymarket(slug);
+        } catch {
+          return fail("Could not reach Polymarket. Try again shortly.");
+        }
+        if (!snapshot) {
+          return fail(
+            `No live Polymarket market found for "${slug}". Check the URL — closed and renamed markets 404. Paste the address straight from the market page.`,
+          );
+        }
+
+        await logMcpToolCall({
+          userId,
+          apiKeyId,
+          tool: "get_market_evidence",
+          status: "ok",
+          latencyMs: Date.now() - start,
+          inputSummary,
+        });
+
+        return {
+          content: [{ type: "text" as const, text: buildEvidencePacket(snapshot) }],
+        };
+      },
+    );
   },
   {
     serverInfo: {
       name: "polykit",
-      version: "1.0.0",
+      version: "1.1.0",
     },
   },
   {

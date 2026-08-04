@@ -14,7 +14,8 @@ Connect Polykit to Claude or ChatGPT, paste a Polymarket link, and get fair valu
 - MCP endpoint: https://polykit.co/api/mcp
 - Transport: Streamable HTTP (remote MCP)
 - Auth: Bearer connection key (`Authorization: Bearer pk_live_…`)
-- Primary tool: `analyze_market`
+- Primary tool: `analyze_market` (server-side verdict)
+- Also: `get_market_evidence` (verified data + resolution rules + method; the calling model reasons itself)
 - Pricing: $14/mo, cancel anytime; first month $1
 - Setup guide: https://polykit.co/mcp
 - Dashboard (keys + usage): https://polykit.co/dashboard
