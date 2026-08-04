@@ -9,7 +9,7 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://polykit.co";
 export const metadata: Metadata = {
   title: "Pricing — Polymarket MCP for ChatGPT & Claude",
   description:
-    "One plan for full Polykit MCP access in ChatGPT and Claude. $14/month, cancel anytime. First month $1.",
+    "One plan for full Polykit MCP access in ChatGPT and Claude. $1 first month, then $14/month. Cancel anytime.",
   keywords: [
     "Polymarket MCP pricing",
     "ChatGPT Polymarket",
@@ -17,8 +17,8 @@ export const metadata: Metadata = {
     "Polykit",
   ],
   openGraph: {
-    title: "Polykit Pricing — $14/month",
-    description: "Full Polymarket MCP access for ChatGPT and Claude. $14/month, cancel anytime. First month $1.",
+    title: "Polykit Pricing — $1 first month",
+    description: "Full Polymarket MCP access for ChatGPT and Claude. $1 first month, then $14/month.",
     url: `${SITE_URL}/pricing`,
   },
   alternates: { canonical: `${SITE_URL}/pricing` },

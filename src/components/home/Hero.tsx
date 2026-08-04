@@ -51,14 +51,7 @@ export function Hero() {
             transform: visible ? "translateY(0)" : "translateY(12px)",
           }}
         >
-          <div className="supaste-glass mx-auto inline-flex items-center gap-2 rounded-full px-3.5 py-1.5">
-            <Link2 size={13} className="text-white" />
-            <p className="text-[13px] font-medium text-white">
-              A Polymarket MCP for Claude &amp; ChatGPT
-            </p>
-          </div>
-
-          <h1 className="mt-7 font-display text-[clamp(2.4rem,6vw,4rem)] font-semibold leading-[1.05] tracking-[-0.035em] text-white">
+          <h1 className="font-display text-[clamp(2.4rem,6vw,4rem)] font-semibold leading-[1.05] tracking-[-0.035em] text-white">
             Turn your Claude into a Polymarket Expert
           </h1>
           <p className="mx-auto mt-5 max-w-xl text-lg leading-relaxed text-white/90">

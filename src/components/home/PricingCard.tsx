@@ -17,7 +17,7 @@ export function PricingCard() {
       <div className="mx-auto max-w-6xl px-6 md:px-10">
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="font-display text-3xl font-semibold tracking-[-0.02em] text-[#0d0d0d] md:text-4xl">
-            $14 a month. Cancel anytime.
+            $1 for your first month.
           </h2>
           <p className="mt-3 text-[16px] text-[#525252]">
             One plan, full access from day one across Claude and ChatGPT. No usage limits, no lock-in.
@@ -46,12 +46,12 @@ export function PricingCard() {
 
               <div className="mt-6 flex items-end gap-2">
                 <span className="font-display text-5xl font-semibold tracking-[-0.03em] text-[#0d0d0d]">
-                  $14
+                  $1
                 </span>
-                <span className="pb-1 text-[#525252]">/month</span>
+                <span className="pb-1 text-[#525252]">first month</span>
               </div>
               <p className="mt-1 text-sm text-[#737373]">
-                Cancel anytime. <span className="font-medium text-[#0d0d0d]">First month $1.</span>
+                then <span className="font-medium text-[#0d0d0d]">$14/month</span>. Cancel anytime.
               </p>
 
               <StartCta
