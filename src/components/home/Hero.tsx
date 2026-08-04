@@ -168,10 +168,10 @@ function SampleResult() {
           </span>
         </div>
         <p className="mt-2 text-[15px] font-semibold leading-snug text-[#0d0d0d]">
-          Will the US enter a recession in 2026?
+          US recession by end of 2026?
         </p>
         <p className="mt-1 font-mono text-[12px] text-[#737373]">
-          polymarket.com/event/us-recession-in-2026
+          polymarket.com/event/us-recession-by-end-of-2026
         </p>
 
         <div className="mt-6 grid grid-cols-3 gap-2.5">
@@ -223,7 +223,7 @@ function SampleResult() {
               <p className="text-[13px] leading-relaxed text-[#eceae4]">
                 Analyze this and tell me if there&apos;s edge:{" "}
                 <span className="text-[#c4b5a0]">
-                  polymarket.com/event/us-recession-in-2026
+                  polymarket.com/event/us-recession-by-end-of-2026
                 </span>
               </p>
             </div>

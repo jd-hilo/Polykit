@@ -7,7 +7,7 @@ import { Check, Copy, ChevronDown, Trash2 } from "lucide-react";
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://polykit.co";
 const MCP_URL = `${SITE_URL}/api/mcp`;
 const SAMPLE_PROMPT =
-  "Analyze this Polymarket market and tell me if there's edge: https://polymarket.com/event/us-recession-in-2026";
+  "Analyze this Polymarket market and tell me if there's edge: https://polymarket.com/event/us-recession-by-end-of-2026";
 
 type ApiKeyRow = {
   id: string;
