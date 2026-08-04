@@ -155,6 +155,12 @@ export default function DashboardHome() {
     [keyForConfig],
   );
 
+  const claudeCodeCmd = useMemo(
+    () =>
+      `claude mcp add --transport http polykit ${MCP_URL} \\\n  --header "Authorization: Bearer ${keyForConfig}"`,
+    [keyForConfig],
+  );
+
   return (
     <div className="mx-auto max-w-2xl px-6 py-8 md:px-10 md:py-10">
       <div className="mb-8">
@@ -270,7 +276,8 @@ export default function DashboardHome() {
                 Plug it into your AI
               </h2>
               <p className="mt-1 text-sm text-[#525252]">
-                Pick the app you use. Copy the block. Paste it where the steps say.
+                Pick the app you use. Claude.ai signs you in directly; every other client
+                uses your connection key.
               </p>
 
               <div className="mt-4 flex flex-wrap gap-2">
@@ -296,36 +303,83 @@ export default function DashboardHome() {
                 ))}
               </div>
 
-              {!freshKey && hasKey && (
+              {!freshKey && hasKey && app !== "claude" && (
                 <p className="mt-3 rounded-lg bg-[#fffbeb] px-3 py-2 text-[13px] text-[#92400e]">
                   Replace <strong>YOUR_CONNECTION_KEY</strong> with the key you copied when you
                   created it. Or create a new key above so we fill it in for you.
                 </p>
               )}
+              {!freshKey && hasKey && app === "claude" && (
+                <p className="mt-3 rounded-lg bg-[#fffbeb] px-3 py-2 text-[13px] text-[#92400e]">
+                  Connecting from claude.ai? Ignore the key entirely. For Desktop and Code,
+                  replace <strong>YOUR_CONNECTION_KEY</strong> with the key you copied, or
+                  create a new one above.
+                </p>
+              )}
 
               {app === "claude" && (
-                <div className="mt-4 space-y-4">
-                  <ol className="list-decimal space-y-2 pl-5 text-sm leading-relaxed text-[#525252]">
-                    <li>
-                      Open Claude → <strong>Settings</strong> → <strong>Developer</strong> →{" "}
-                      <strong>Edit Config</strong> (Desktop), or{" "}
-                      <strong>Connectors</strong> → <strong>Add custom connector</strong>{" "}
-                      (claude.ai).
-                    </li>
-                    <li>Paste the block below (or paste the URL + your key as a header).</li>
-                    <li>Quit and reopen Claude, then turn Polykit on in the chat.</li>
-                  </ol>
-                  <div>
-                    <p className="mb-2 text-[12px] font-medium text-[#737373]">
-                      MCP URL (if asked separately)
+                <div className="mt-4 space-y-5">
+                  {/* claude.ai signs you in with OAuth, so it needs no key at all. */}
+                  <div className="rounded-xl border border-[#bfdbfe] bg-[#eff6ff] p-4">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="rounded-full bg-[#006fff] px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-white">
+                        Easiest
+                      </span>
+                      <p className="text-[14px] font-semibold text-[#0d0d0d]">
+                        Claude.ai (web &amp; mobile)
+                      </p>
+                    </div>
+                    <p className="mt-2 text-[13px] leading-relaxed text-[#1e40af]">
+                      No connection key needed — you&apos;ll sign in to Polykit instead.
                     </p>
-                    <div className="mb-4 flex flex-wrap items-center gap-2 rounded-xl border border-[#e3e3e3] bg-[#f7f7f7] px-3 py-2.5">
+                    <ol className="mt-3 list-decimal space-y-1.5 pl-5 text-sm leading-relaxed text-[#525252]">
+                      <li>
+                        <strong>Settings</strong> → <strong>Connectors</strong> →{" "}
+                        <strong>Add custom connector</strong>.
+                      </li>
+                      <li>
+                        Name it <strong>Polykit</strong> and paste the URL below.
+                      </li>
+                      <li>
+                        Leave <strong>OAuth Client ID</strong> and{" "}
+                        <strong>Client Secret</strong> empty.
+                      </li>
+                      <li>
+                        Click <strong>Connect</strong>, sign in, and approve access.
+                      </li>
+                    </ol>
+                    <div className="mt-3 flex flex-wrap items-center gap-2 rounded-lg border border-[#bfdbfe] bg-white px-3 py-2.5">
                       <code className="min-w-0 flex-1 break-all text-[13px] text-[#0d0d0d]">
                         {MCP_URL}
                       </code>
                       <CopyButton value={MCP_URL} />
                     </div>
-                    <CodeBlock code={claudeConfig} label="Paste into Claude" />
+                  </div>
+
+                  {/* Desktop and Code read a config file, so they use the key. */}
+                  <div>
+                    <p className="text-[14px] font-semibold text-[#0d0d0d]">Claude Desktop</p>
+                    <ol className="mt-2 list-decimal space-y-1.5 pl-5 text-sm leading-relaxed text-[#525252]">
+                      <li>
+                        <strong>Settings</strong> → <strong>Developer</strong> →{" "}
+                        <strong>Edit Config</strong>.
+                      </li>
+                      <li>Paste the block below, keeping any servers already listed.</li>
+                      <li>Quit and reopen Claude, then turn Polykit on in the chat.</li>
+                    </ol>
+                    <div className="mt-3">
+                      <CodeBlock code={claudeConfig} label="claude_desktop_config.json" />
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-[14px] font-semibold text-[#0d0d0d]">Claude Code</p>
+                    <p className="mt-2 text-sm leading-relaxed text-[#525252]">
+                      One command in your terminal:
+                    </p>
+                    <div className="mt-3">
+                      <CodeBlock code={claudeCodeCmd} label="Terminal" />
+                    </div>
                   </div>
                 </div>
               )}

@@ -52,6 +52,9 @@ export function McpSetupGuide({ mcpUrl }: { mcpUrl: string }) {
   }
 }`;
 
+  const claudeCodeCmd = `claude mcp add --transport http polykit ${mcpUrl} \\
+  --header "Authorization: Bearer YOUR_CONNECTION_KEY"`;
+
   return (
     <div>
       <div className="flex flex-wrap gap-2">
@@ -113,37 +116,59 @@ export function McpSetupGuide({ mcpUrl }: { mcpUrl: string }) {
 
       {app === "claude" && (
         <div className="mt-5 space-y-5">
-          <div>
-            <p className="text-sm font-semibold text-[#0d0d0d]">Claude.ai (web)</p>
-            <ol className="mt-2 list-decimal space-y-2 pl-5 text-sm leading-relaxed text-[#525252]">
+          <div className="rounded-xl border border-[#bfdbfe] bg-[#eff6ff] p-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="rounded-full bg-[#006fff] px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-white">
+                Easiest
+              </span>
+              <p className="text-[14px] font-semibold text-[#0d0d0d]">
+                Claude.ai (web &amp; mobile)
+              </p>
+            </div>
+            <p className="mt-2 text-[13px] leading-relaxed text-[#1e40af]">
+              No connection key needed — you sign in to Polykit instead.
+            </p>
+            <ol className="mt-3 list-decimal space-y-1.5 pl-5 text-sm leading-relaxed text-[#525252]">
               <li>
                 <strong>Settings</strong> → <strong>Connectors</strong> →{" "}
                 <strong>Add custom connector</strong>.
               </li>
               <li>
-                Name it Polykit and paste the URL below. Leave the OAuth client fields
-                empty.
+                Name it <strong>Polykit</strong> and paste the URL below.
               </li>
               <li>
-                Click <strong>Connect</strong> — you&apos;ll sign in to Polykit and approve
-                access. No connection key needed.
+                Leave <strong>OAuth Client ID</strong> and <strong>Client Secret</strong> empty.
+              </li>
+              <li>
+                Click <strong>Connect</strong>, sign in, and approve access.
               </li>
             </ol>
-            <div className="mt-3 flex flex-wrap items-center gap-2 rounded-xl border border-[#e3e3e3] bg-[#f7f7f7] px-3 py-2.5">
+            <div className="mt-3 flex flex-wrap items-center gap-2 rounded-lg border border-[#bfdbfe] bg-white px-3 py-2.5">
               <code className="min-w-0 flex-1 break-all text-[13px] text-[#0d0d0d]">{mcpUrl}</code>
               <CopyButton value={mcpUrl} />
             </div>
           </div>
 
           <div>
-            <p className="text-sm font-semibold text-[#0d0d0d]">Claude Desktop &amp; Claude Code</p>
+            <p className="text-[14px] font-semibold text-[#0d0d0d]">Claude Desktop</p>
             <p className="mt-2 text-sm leading-relaxed text-[#525252]">
-              These support custom headers, so they use a connection key instead:{" "}
               <strong>Settings</strong> → <strong>Developer</strong> →{" "}
-              <strong>Edit Config</strong>, then paste the block below and restart Claude.
+              <strong>Edit Config</strong>, paste the block below, then quit and reopen Claude.
             </p>
+            <div className="mt-3">
+              <CodeBlock code={config} label="claude_desktop_config.json" />
+            </div>
           </div>
-          <CodeBlock code={config} label="Paste into Claude" />
+
+          <div>
+            <p className="text-[14px] font-semibold text-[#0d0d0d]">Claude Code</p>
+            <p className="mt-2 text-sm leading-relaxed text-[#525252]">
+              One command in your terminal:
+            </p>
+            <div className="mt-3">
+              <CodeBlock code={claudeCodeCmd} label="Terminal" />
+            </div>
+          </div>
         </div>
       )}
 
