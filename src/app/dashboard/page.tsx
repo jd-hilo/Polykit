@@ -58,6 +58,19 @@ function CopyButton({ value, label = "Copy" }: { value: string; label?: string }
   );
 }
 
+/** One row of a connector form: the field's exact label, and what to paste in it. */
+function ConnectorField({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-lg border border-[#bfdbfe] bg-white px-3 py-2.5">
+      <p className="text-[11px] font-medium uppercase tracking-wide text-[#737373]">{label}</p>
+      <div className="mt-1 flex flex-wrap items-center gap-2">
+        <code className="min-w-0 flex-1 break-all text-[13px] text-[#0d0d0d]">{value}</code>
+        <CopyButton value={value} />
+      </div>
+    </div>
+  );
+}
+
 function CodeBlock({ code, label }: { code: string; label?: string }) {
   return (
     <div className="overflow-hidden rounded-xl border border-[#1f1e1d] bg-[#0d0d0d]">
@@ -319,7 +332,8 @@ export default function DashboardHome() {
 
               {app === "claude" && (
                 <div className="mt-4 space-y-5">
-                  {/* claude.ai signs you in with OAuth, so it needs no key at all. */}
+                  {/* claude.ai signs you in with OAuth, so it needs no key at all. The
+                      field names below mirror Claude's form exactly. */}
                   <div className="rounded-xl border border-[#bfdbfe] bg-[#eff6ff] p-4">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="rounded-full bg-[#006fff] px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-white">
@@ -332,28 +346,30 @@ export default function DashboardHome() {
                     <p className="mt-2 text-[13px] leading-relaxed text-[#1e40af]">
                       No connection key needed — you&apos;ll sign in to Polykit instead.
                     </p>
-                    <ol className="mt-3 list-decimal space-y-1.5 pl-5 text-sm leading-relaxed text-[#525252]">
-                      <li>
-                        <strong>Settings</strong> → <strong>Connectors</strong> →{" "}
-                        <strong>Add custom connector</strong>.
-                      </li>
-                      <li>
-                        Name it <strong>Polykit</strong> and paste the URL below.
-                      </li>
-                      <li>
-                        Leave <strong>OAuth Client ID</strong> and{" "}
-                        <strong>Client Secret</strong> empty.
-                      </li>
-                      <li>
-                        Click <strong>Connect</strong>, sign in, and approve access.
-                      </li>
-                    </ol>
-                    <div className="mt-3 flex flex-wrap items-center gap-2 rounded-lg border border-[#bfdbfe] bg-white px-3 py-2.5">
-                      <code className="min-w-0 flex-1 break-all text-[13px] text-[#0d0d0d]">
-                        {MCP_URL}
-                      </code>
-                      <CopyButton value={MCP_URL} />
+
+                    <p className="mt-3.5 text-[13px] font-medium text-[#0d0d0d]">
+                      1. Go to Settings → Connectors → Add custom connector
+                    </p>
+
+                    <p className="mt-3.5 text-[13px] font-medium text-[#0d0d0d]">
+                      2. Fill in the two fields:
+                    </p>
+                    <div className="mt-2 space-y-2">
+                      <ConnectorField label="Name" value="Polykit" />
+                      <ConnectorField label="Remote MCP server URL" value={MCP_URL} />
                     </div>
+                    <p className="mt-2 text-[12px] leading-relaxed text-[#525252]">
+                      Leave everything under <strong>Advanced settings</strong> blank — the
+                      OAuth Client ID and Secret are not needed.
+                    </p>
+
+                    <p className="mt-3.5 text-[13px] font-medium text-[#0d0d0d]">
+                      3. Click <span className="font-semibold">Connect</span>
+                    </p>
+                    <p className="mt-1 text-[12px] leading-relaxed text-[#525252]">
+                      Sign in to Polykit, press <strong>Approve and connect</strong>, and
+                      you&apos;re done. Then turn Polykit on in a chat.
+                    </p>
                   </div>
 
                   {/* Desktop and Code read a config file, so they use the key. */}
