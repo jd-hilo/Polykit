@@ -241,9 +241,25 @@ export function buildEvidencePacket(snap: PolymarketSnapshot): string {
   }
 
   /* Method ------------------------------------------------------------- */
-  out.push(`\n## ${snap.siblings && snap.siblings.length > 1 ? 5 : 4}. How to analyze this`);
+  const methodNo = snap.siblings && snap.siblings.length > 1 ? 5 : 4;
+
+  out.push(`\n## ${methodNo}. How to answer — lead with the call`);
   out.push(
-    `**Work in this order. Skipping step 2 is the most common way this analysis goes wrong.**`,
+    `The user wants the verdict first and the reasoning underneath. **Open your reply with a single bolded line in exactly this shape**, filled in with your own numbers:`,
+  );
+  out.push(
+    `\n> **[BUY YES | BUY NO | PASS] · pay [price]¢ · fair [your estimate]¢ · edge [±N]¢ · confidence [low|medium|high] · exit [date or trigger]**`,
+  );
+  out.push(
+    `\nFill every field from your own analysis — the brackets are a template, not a suggestion, and nothing above implies which side is right. YES is ${yes}¢ and NO is ${no}¢ right now; which of those is cheap is exactly what you are working out. When the edge is under ~3¢ or liquidity is thin, the honest line is \`**PASS · [price]¢ is fair · edge <3¢**\`.`,
+  );
+  out.push(
+    `Then, and only then, show the work below it. Never make the reader hunt for the answer at the bottom.`,
+  );
+
+  out.push(`\n## ${methodNo + 1}. How to get there`);
+  out.push(
+    `**Reason in this order — it is not the order you present in. Skipping step 2 is the most common way this analysis goes wrong.**`,
   );
   out.push(
     `1. **Read the rules above and state the mechanical trigger** — which series, which threshold, which window, which body publishes it, and the last date a qualifying observation can land.`,
@@ -258,7 +274,10 @@ export function buildEvidencePacket(snap: PolymarketSnapshot): string {
     `4. **Estimate P(YES)** by combining the open paths, compare against the ${yes}¢ market price, and state the edge in cents.`,
   );
   out.push(
-    `5. **Give a verdict** — BUY YES, BUY NO, or PASS — with your confidence, the key risks, and what would change your mind. If the edge is under ~3¢, or liquidity is thin, PASS is the honest answer.`,
+    `5. **Write the verdict line first**, then support it underneath: the mechanical trigger in one line, which paths are open or closed and why, how you got to fair value, the key risks, and what would change your mind. If the edge is under ~3¢, or liquidity is thin, PASS is the honest answer — say so in the verdict line rather than burying it.`,
+  );
+  out.push(
+    `6. **Say when to get out.** A market whose last path closes on a scheduled release often reprices hard on that date; exiting there can beat holding to resolution for a few extra cents. Name the date or the print that should trigger the exit.`,
   );
 
   out.push(`\n**Sourcing rules:**`);
