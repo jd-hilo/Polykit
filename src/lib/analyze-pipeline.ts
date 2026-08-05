@@ -434,6 +434,8 @@ async function prepareContext(args: {
   dataUrl: string | null;
   slug: string | null;
   userContext: string | null;
+  /** Skip the Perplexity round-trip when the caller only needs the market. */
+  skipSentiment?: boolean;
 }): Promise<PreparedContext> {
   const { client, dataUrl, slug, userContext } = args;
 
@@ -510,7 +512,9 @@ async function prepareContext(args: {
     snapshot ? "yes" : "no",
   );
 
-  const sentiment_context = await fetchSentimentContext(question).catch(() => null);
+  const sentiment_context = args.skipSentiment
+    ? null
+    : await fetchSentimentContext(question).catch(() => null);
 
   return {
     market_data: { question, slug: finalSlug },
@@ -688,6 +692,44 @@ export function summarizeAnalyzeInput(input: AnalyzeInput): string {
   if (input.slug?.trim()) return input.slug.trim().slice(0, 200);
   if (input.dataUrl) return "[screenshot]";
   return "unknown";
+}
+
+/**
+ * Resolve an input to a live Polymarket snapshot and stop there.
+ *
+ * This is the path behind analyze_market now that the calling model does the
+ * judging: no analysis model, no sentiment fetch. A screenshot still costs one
+ * small vision call to work out which market it is, because there is no other
+ * way to turn pixels into a slug; a url or slug costs nothing.
+ */
+export async function resolveMarketSnapshot(
+  input: AnalyzeInput,
+): Promise<{ ok: true; snapshot: PolymarketSnapshot } | { ok: false; error: string }> {
+  const normalized = normalizeAnalyzeInput(input);
+  if (normalized.error) return { ok: false, error: normalized.error };
+
+  const { slug, dataUrl, userContext } = normalized;
+  // Only a screenshot needs the model; url/slug resolves against Polymarket alone.
+  const client = dataUrl ? getOpenAIClient() : null;
+
+  const ctx = await prepareContext({
+    client,
+    dataUrl,
+    slug,
+    userContext,
+    skipSentiment: true,
+  });
+
+  if (!ctx.snapshot) {
+    return {
+      ok: false,
+      error: dataUrl
+        ? "Couldn't match that screenshot to a live Polymarket market. Paste the market URL instead — it resolves reliably."
+        : `No live Polymarket market found for "${slug}". Closed and renamed markets 404; copy the address from the market page.`,
+    };
+  }
+
+  return { ok: true, snapshot: ctx.snapshot };
 }
 
 /** Run the full analyzer pipeline. */

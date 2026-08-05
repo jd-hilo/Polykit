@@ -4,7 +4,7 @@ Polykit (https://polykit.co) is a paid headless MCP (Model Context Protocol) ser
 
 ## One-sentence pitch
 
-Connect Polykit to Claude or ChatGPT, paste a Polymarket link, and get fair value, edge, confidence, and a BUY / SELL / PASS recommendation in seconds.
+Connect Polykit to Claude or ChatGPT, paste a Polymarket link, and your model gets the live prices, the full resolution rules, and a method for working out fair value, edge, and a BUY / SELL / PASS call.
 
 ## Product facts
 
@@ -14,8 +14,7 @@ Connect Polykit to Claude or ChatGPT, paste a Polymarket link, and get fair valu
 - MCP endpoint: https://polykit.co/api/mcp
 - Transport: Streamable HTTP (remote MCP)
 - Auth: Bearer connection key (`Authorization: Bearer pk_live_…`)
-- Primary tool: `analyze_market` (server-side verdict)
-- Also: `get_market_evidence` (verified data + resolution rules + method; the calling model reasons itself)
+- Only tool: `analyze_market` (returns verified data + resolution rules + method; the calling model reasons and gives the verdict)
 - Pricing: $14/mo, cancel anytime; first month $1
 - Setup guide: https://polykit.co/mcp
 - Dashboard (keys + usage): https://polykit.co/dashboard

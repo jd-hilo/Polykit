@@ -7,16 +7,15 @@ import {
 import { ACCESS_TOKEN_PREFIX, authenticateAccessToken } from "@/lib/oauth";
 import { isUserSubscribed } from "@/lib/subscription";
 import { buildEvidencePacket } from "@/lib/evidence";
-import { resolvePolymarket, slugFromUrl } from "@/lib/polymarket";
 import {
   dataUrlFromBase64,
-  parseEffort,
-  runAnalyze,
+  resolveMarketSnapshot,
   summarizeAnalyzeInput,
 } from "@/lib/analyze-pipeline";
 
 export const runtime = "nodejs";
-export const maxDuration = 60;
+// Resolution is a couple of Polymarket calls now, not a model round-trip.
+export const maxDuration = 30;
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://polykit.co";
 
@@ -27,7 +26,7 @@ const mcpHandler = createMcpHandler(
       {
         title: "Analyze Polymarket",
         description:
-          "Analyze a Polymarket prediction market. Provide a Polymarket URL or slug, and optionally a base64-encoded screenshot. Returns fair value, edge, confidence, BUY/SELL/PASS recommendation, reasons, and risks.",
+          "Get everything needed to analyze a Polymarket prediction market, then do the analysis yourself. Accepts a Polymarket URL, slug, or screenshot. Returns live prices, the full resolution rules, sibling markets, and a step-by-step method. It deliberately does not hand back a pre-made verdict: you decide which resolution paths are still open from already-published data, look up anything the rules depend on, and give the user a call with your own reasoning. Search the web for the published observations the rules name before concluding.",
         inputSchema: {
           url: z
             .string()
@@ -48,11 +47,7 @@ const mcpHandler = createMcpHandler(
           context: z
             .string()
             .optional()
-            .describe("Optional context or question for the analyst"),
-          reasoning_effort: z
-            .enum(["low", "medium", "high"])
-            .optional()
-            .describe("OpenAI reasoning effort (default: medium)"),
+            .describe("Optional context or question from the user"),
         },
       },
       async (args, extra) => {
@@ -78,133 +73,11 @@ const mcpHandler = createMcpHandler(
           dataUrl: args.image_base64 ? "[screenshot]" : undefined,
         });
 
-        let dataUrl: string | null = null;
-        if (args.image_base64) {
-          const mime = args.mime_type ?? "image/png";
-          const built = dataUrlFromBase64(args.image_base64, mime);
-          if (built.error) {
-            await logMcpToolCall({
-              userId,
-              apiKeyId,
-              tool: "analyze_market",
-              status: "error",
-              latencyMs: Date.now() - start,
-              inputSummary,
-              errorMessage: built.error,
-            });
-            return {
-              content: [{ type: "text" as const, text: built.error }],
-              isError: true,
-            };
-          }
-          dataUrl = built.dataUrl;
-        }
-
-        if (!args.url?.trim() && !args.slug?.trim() && !dataUrl) {
-          const err = "Provide url, slug, or image_base64.";
-          await logMcpToolCall({
-            userId,
-            apiKeyId,
-            tool: "analyze_market",
-            status: "error",
-            latencyMs: Date.now() - start,
-            inputSummary,
-            errorMessage: err,
-          });
-          return {
-            content: [{ type: "text" as const, text: err }],
-            isError: true,
-          };
-        }
-
-        const result = await runAnalyze({
-          url: args.url,
-          slug: args.slug,
-          dataUrl,
-          context: args.context,
-          reasoning_effort: parseEffort(args.reasoning_effort),
-        });
-
-        const latencyMs = Date.now() - start;
-
-        if (!result.ok) {
-          await logMcpToolCall({
-            userId,
-            apiKeyId,
-            tool: "analyze_market",
-            status: "error",
-            latencyMs,
-            inputSummary,
-            errorMessage: result.error,
-          });
-          return {
-            content: [{ type: "text" as const, text: result.error }],
-            isError: true,
-          };
-        }
-
-        await logMcpToolCall({
-          userId,
-          apiKeyId,
-          tool: "analyze_market",
-          status: "ok",
-          latencyMs,
-          inputSummary,
-        });
-
-        return {
-          content: [
-            {
-              type: "text" as const,
-              text: JSON.stringify(result.result, null, 2),
-            },
-          ],
-        };
-      },
-    );
-
-    server.registerTool(
-      "get_market_evidence",
-      {
-        title: "Get Polymarket evidence",
-        description:
-          "Fetch verified Polymarket data for a market and reason about it yourself. Returns live prices, the full resolution rules, sibling markets, and a step-by-step method. Prefer this over analyze_market when you can search the web: you enumerate which resolution paths are still open from already-published data, which is where a pre-baked verdict most often goes wrong. Fast, and it never guesses at outside figures.",
-        inputSchema: {
-          url: z
-            .string()
-            .optional()
-            .describe("Full Polymarket event or market URL"),
-          slug: z
-            .string()
-            .optional()
-            .describe("Polymarket market or event slug (alternative to url)"),
-        },
-      },
-      async (args, extra) => {
-        const userId = (extra?.authInfo?.extra as { userId?: string } | undefined)?.userId;
-        const apiKeyId = (extra?.authInfo?.extra as { apiKeyId?: string } | undefined)?.apiKeyId;
-
-        if (!userId) {
-          return {
-            content: [
-              {
-                type: "text" as const,
-                text: `Unauthorized. Get a connection key at ${SITE_URL}/dashboard`,
-              },
-            ],
-            isError: true,
-          };
-        }
-
-        const start = Date.now();
-        const rawInput = args.url?.trim() || args.slug?.trim() || "";
-        const inputSummary = rawInput.slice(0, 200);
-
         const fail = async (message: string) => {
           await logMcpToolCall({
             userId,
             apiKeyId,
-            tool: "get_market_evidence",
+            tool: "analyze_market",
             status: "error",
             latencyMs: Date.now() - start,
             inputSummary,
@@ -216,32 +89,42 @@ const mcpHandler = createMcpHandler(
           };
         };
 
-        if (!rawInput) return fail("Provide a Polymarket url or slug.");
+        let dataUrl: string | null = null;
+        if (args.image_base64) {
+          const built = dataUrlFromBase64(args.image_base64, args.mime_type ?? "image/png");
+          if (built.error) return fail(built.error);
+          dataUrl = built.dataUrl;
+        }
 
-        const slug = slugFromUrl(rawInput) ?? rawInput;
-        let snapshot = null;
+        if (!args.url?.trim() && !args.slug?.trim() && !dataUrl) {
+          return fail("Provide url, slug, or image_base64.");
+        }
+
+        let resolved;
         try {
-          snapshot = await resolvePolymarket(slug);
+          resolved = await resolveMarketSnapshot({
+            url: args.url,
+            slug: args.slug,
+            dataUrl,
+            context: args.context,
+          });
         } catch {
           return fail("Could not reach Polymarket. Try again shortly.");
         }
-        if (!snapshot) {
-          return fail(
-            `No live Polymarket market found for "${slug}". Check the URL — closed and renamed markets 404. Paste the address straight from the market page.`,
-          );
-        }
+
+        if (!resolved.ok) return fail(resolved.error);
 
         await logMcpToolCall({
           userId,
           apiKeyId,
-          tool: "get_market_evidence",
+          tool: "analyze_market",
           status: "ok",
           latencyMs: Date.now() - start,
           inputSummary,
         });
 
         return {
-          content: [{ type: "text" as const, text: buildEvidencePacket(snapshot) }],
+          content: [{ type: "text" as const, text: buildEvidencePacket(resolved.snapshot) }],
         };
       },
     );
@@ -249,7 +132,7 @@ const mcpHandler = createMcpHandler(
   {
     serverInfo: {
       name: "polykit",
-      version: "1.1.0",
+      version: "2.0.0",
     },
   },
   {
