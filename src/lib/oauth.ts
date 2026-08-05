@@ -14,7 +14,7 @@
 // user Clerk has already authenticated and whose subscription is active.
 
 import { createHash, randomBytes, timingSafeEqual } from "crypto";
-import { prisma } from "./prisma";
+import { prisma, withDbRetry } from "./prisma";
 
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://polykit.co";
 
@@ -271,18 +271,21 @@ export type AccessTokenAuth = { userId: string; clientId: string; scope: string 
 export async function authenticateAccessToken(raw: string): Promise<AccessTokenAuth | null> {
   if (!raw?.startsWith(ACCESS_TOKEN_PREFIX)) return null;
 
-  const row = await prisma.oAuthToken.findUnique({
-    where: { tokenHash: sha256(raw) },
-    select: {
-      id: true,
-      userId: true,
-      clientId: true,
-      scope: true,
-      tokenType: true,
-      revokedAt: true,
-      expiresAt: true,
-    },
-  });
+  // Runs on every MCP call from an OAuth client — see authenticateApiKey.
+  const row = await withDbRetry(() =>
+    prisma.oAuthToken.findUnique({
+      where: { tokenHash: sha256(raw) },
+      select: {
+        id: true,
+        userId: true,
+        clientId: true,
+        scope: true,
+        tokenType: true,
+        revokedAt: true,
+        expiresAt: true,
+      },
+    }),
+  );
   if (!row || row.tokenType !== "access" || row.revokedAt) return null;
   if (row.expiresAt && row.expiresAt.getTime() < Date.now()) return null;
 

@@ -1,6 +1,6 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { checkWhopAccess } from "./whop";
-import { prisma } from "./prisma";
+import { prisma, withDbRetry } from "./prisma";
 
 // How long we trust a DB-cached "active"/"trialing" row before re-verifying
 // against Whop's live API. Whop only fires `membership.deactivated` webhooks
@@ -48,10 +48,13 @@ export async function isUserSubscribed(
     email: string | null;
   } | null = null;
   try {
-    cached = await prisma.subscription.findUnique({
-      where: { userId },
-      select: { status: true, expiresAt: true, updatedAt: true, email: true },
-    });
+    // Retried: this gates every MCP call, so a blip must not revoke access.
+    cached = await withDbRetry(() =>
+      prisma.subscription.findUnique({
+        where: { userId },
+        select: { status: true, expiresAt: true, updatedAt: true, email: true },
+      }),
+    );
   } catch (e) {
     console.error("[isUserSubscribed] DB read failed, falling back to API", e);
   }

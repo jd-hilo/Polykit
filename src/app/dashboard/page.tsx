@@ -144,9 +144,20 @@ export default function DashboardHome() {
 
   async function revoke(id: string) {
     if (!confirm("Delete this key? Anything using it will stop working.")) return;
-    await fetch(`/api/keys/${id}`, { method: "DELETE" });
-    if (freshKey) setFreshKey(null);
-    await load();
+    setError(null);
+    try {
+      const res = await fetch(`/api/keys/${id}`, { method: "DELETE" });
+      if (!res.ok) {
+        setError("Could not delete that key. Try again in a moment.");
+        return;
+      }
+      if (freshKey) setFreshKey(null);
+      await load();
+    } catch {
+      // An unhandled rejection here surfaced as "TypeError: Failed to fetch"
+      // with no explanation — usually a dropped connection, not a real fault.
+      setError("Network error deleting that key. Check your connection and try again.");
+    }
   }
 
   const keyForConfig = freshKey ?? "YOUR_CONNECTION_KEY";

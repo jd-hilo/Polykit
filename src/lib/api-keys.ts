@@ -1,5 +1,5 @@
 import { createHash, randomBytes } from "crypto";
-import { prisma } from "./prisma";
+import { prisma, withDbRetry } from "./prisma";
 import { isUserSubscribed } from "./subscription";
 
 const KEY_PREFIX = "pk_live_";
@@ -29,10 +29,13 @@ export async function authenticateApiKey(
   if (!raw.startsWith(KEY_PREFIX)) return null;
 
   const hash = hashApiKey(raw);
-  const row = await prisma.apiKey.findUnique({
-    where: { keyHash: hash },
-    select: { id: true, userId: true, revokedAt: true },
-  });
+  // Runs on every MCP call — a momentary blip must not look like a bad key.
+  const row = await withDbRetry(() =>
+    prisma.apiKey.findUnique({
+      where: { keyHash: hash },
+      select: { id: true, userId: true, revokedAt: true },
+    }),
+  );
   if (!row || row.revokedAt) return null;
 
   const subscribed = await isUserSubscribed(row.userId);
