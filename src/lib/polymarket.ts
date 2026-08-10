@@ -1294,7 +1294,12 @@ export function snapshotToContext(snap: PolymarketSnapshot | null): string | nul
     `Liquidity (USD): ${Math.round(snap.liquidityUsd).toLocaleString()}`,
   ]);
   if (snap.endsAt) lines.push(`Ends at: ${snap.endsAt}`);
-  if (snap.description) lines.push(`Description: ${snap.description.slice(0, 600)}`);
+  if (snap.description) {
+    // The resolution rules decide the question, so they get real room. At 600
+    // chars markets like the recession one lost the advance-estimate mechanics
+    // that define which paths are still open.
+    lines.push(`Resolution rules (verbatim): ${snap.description.slice(0, 2000)}`);
+  }
   return lines.join("\n");
 }
 

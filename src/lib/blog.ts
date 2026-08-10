@@ -73,7 +73,7 @@ export const POSTS: Post[] = [
         h2: "How Polykit Makes Your First Month Easier",
         paras: [
           "Polykit is built for exactly this problem — the gap between 'I understand prediction markets' and 'I can consistently find mispriced contracts.' Screenshot any Polymarket market and our AI returns a fair-value estimate, a YES/NO recommendation, a written thesis grounded in live news, and a risk score. You trade on Polymarket; we just tell you when the price looks wrong.",
-          "Pair the Analyzer with our Paper Trading mode to practice risk-free for a week before committing real USDC. Most users find that two or three weeks of guided paper trading saves them more money than the subscription costs for a year. Start with the beginner flow, read the Analyzer's reasoning on every pick, and you'll internalize the edge patterns fast.",
+          "Because Polykit runs inside Claude or ChatGPT, you can talk through a market before you commit capital — ask for the fair value, then ask why, then push back on the reasoning. Reading the Analyzer's thesis on every market you consider is the fastest way to internalize the edge patterns yourself.",
         ],
       },
     ],
@@ -141,7 +141,7 @@ export const POSTS: Post[] = [
         h2: "How Polykit Supports Both",
         paras: [
           "Polykit's Analyzer accepts screenshots from either Polymarket or Kalshi. Our vision model reads the contract title, YES/NO price, volume, and deadline, then runs the same news-grounded pricing engine regardless of venue. The output is identical: fair value estimate, directional recommendation, written reasoning, and a risk score.",
-          "This means you can shop the same thesis across both markets and take the better price. Our Wallet Tracker surfaces sharp Polymarket addresses, while Kalshi's closed data model means we focus on volume and price-action signals there. Bottom line: one subscription, two venues, one workflow.",
+          "This means you can shop the same thesis across both venues and take the better price. Polykit analyzes Polymarket markets directly from a link or screenshot, so you can price a thesis quickly and then compare it against what Kalshi is offering. Bottom line: one workflow, applied wherever the contract is cheaper.",
         ],
       },
     ],
@@ -199,10 +199,10 @@ export const POSTS: Post[] = [
         ],
       },
       {
-        h2: "An Example: The 15¢ Gap",
+        h2: "A Hypothetical Example: The 15¢ Gap",
         paras: [
-          "During the 2024 election cycle, a down-ballot Senate race was trading at 42¢ YES. The Analyzer read the screenshot, pulled live polling from three pollsters plus a fresh fundraising disclosure, and returned a fair value of 57¢ with a clear thesis: the market hadn't repriced after a Tuesday fundraising filing that revealed a 3-to-1 cash advantage. That's 15¢ of edge on a $500 position — $75 of expected value, excluding variance, if the model is right.",
-          "The contract resolved YES. But more importantly, the Analyzer flagged the mispricing within minutes of the filing hitting the FEC database, while the market took another 36 hours to drift to 55¢. Speed plus structured reasoning is the product.",
+          "Here is an illustrative example, not a real trade. Imagine a down-ballot Senate race trading at 42¢ YES. The Analyzer reads the screenshot, pulls live polling plus a fresh fundraising disclosure, and returns a fair value of 57¢ with a clear thesis: the market hasn't repriced after a filing that reveals a large cash advantage. That would be 15¢ of edge on a $500 position — about $75 of expected value, excluding variance, if the estimate is right.",
+          "The point of the example is the workflow, not a promised outcome: the Analyzer aims to surface a possible mispricing quickly and explain the reasoning, so you can decide for yourself. Edge estimates are not guarantees, and results vary.",
         ],
       },
       {
@@ -277,127 +277,7 @@ export const POSTS: Post[] = [
         h2: "Position Sizing for Political Trades",
         paras: [
           "Elections are binary, low-frequency, and heavily correlated. That means no single political trade should be more than 5% of bankroll, and your total simultaneous political exposure should probably cap at 20–25%. If you lose a presidential bet, you probably lose correlated congressional bets too.",
-          "Paper trade the last three months of a cycle before ever taking real positions. The pattern of news-driven price swings, debate overreactions, and late-cycle polling shifts is learnable — but only by watching it play out. Polykit's Paper Trading mode rewinds the clock on historical cycles for exactly this purpose.",
-        ],
-      },
-    ],
-  },
-  {
-    slug: "copy-trading-101",
-    title: "Copy Trading 101: Mirror the Sharpest Wallets",
-    desc: "How to pick a trader to follow on Polymarket, size positions correctly, and avoid the obvious pitfalls.",
-    date: "Jan 24, 2025",
-    read: "5 min read",
-    keywords: [
-      "copy trading Polymarket",
-      "Polymarket wallet tracker",
-      "sharp wallets prediction markets",
-      "follow traders Polymarket",
-      "smart money Polymarket",
-      "Kelly criterion sizing",
-      "prediction market copy trading",
-    ],
-    body: [
-      {
-        h2: "What Copy Trading Means on Prediction Markets",
-        paras: [
-          "Because Polymarket is on-chain, every position every wallet ever takes is public. You can literally watch the best traders in the world place their bets in real time, down to the share. Copy trading is the practice of identifying consistently profitable wallets and piggybacking on their positions — typically at a smaller size and sometimes with minor adjustments for timing.",
-          "This is fundamentally different from copy trading in crypto spot markets, where you're often copying unverified claims of profit. On Polymarket, PnL is provably on-chain. The data doesn't lie, which is why wallet tracking has become one of the most effective workflows in prediction markets.",
-        ],
-      },
-      {
-        h2: "How to Find a Sharp Wallet",
-        paras: [
-          "Three filters separate signal from noise. First, volume — wallets with under $50k traded are usually too small a sample to trust. Second, PnL consistency — look for steady returns across 50+ resolved markets, not one or two giant wins. Third, category diversification — a wallet that only trades one election can't tell you whether it's skilled or lucky.",
-          "Polykit's Wallet Tracker ranks public wallets by ROI, sharpe-like metrics, and win rate across a rolling window. We surface the top 1% by multiple criteria, which is a much faster starting point than scrolling through the Polymarket leaderboard yourself. From there, click into a wallet to see its full open-position list and historical trades.",
-        ],
-      },
-      {
-        h2: "Timing Your Entry",
-        paras: [
-          "The worst way to copy trade is to see a sharp wallet enter at 40¢ and immediately buy at 48¢ because the market already moved. At that point half the edge is gone. A better workflow: when a sharp wallet enters, read Polykit's Analyzer on the same market, form your own view, and enter only if the thesis still makes sense and the price hasn't run past fair value.",
-          "Some users set alerts on specific wallets and try to catch entries within minutes. This works on mid-liquidity markets where the wallet isn't big enough to move price immediately. On top-of-book headline markets, sharp wallets often are the price, so copying them is more like agreeing with them at their fill price.",
-        ],
-      },
-      {
-        h2: "Position Sizing: Kelly vs Flat",
-        paras: [
-          "Two schools. Flat sizing is simple: put 1–2% of bankroll on every copied trade regardless of the sharp wallet's own conviction. This is boring, robust, and hard to screw up. Fractional Kelly sizing scales your stake with estimated edge — bigger positions on higher-conviction copies. It grows faster in expectation but requires that your edge estimates are actually accurate.",
-          "If you're new to copy trading, start flat. Once you've tracked 50+ copied trades and have a sense of which wallets and which categories produce your real wins, shift to quarter-Kelly. Full Kelly is a shortcut to a blown account.",
-        ],
-      },
-      {
-        h2: "Risks You Can't See from the Outside",
-        paras: [
-          "The biggest hidden risk: you can't see off-chain hedges. A sharp wallet might be buying YES on Polymarket because they're short the same event on Kalshi or in an OTC deal. You copy the Polymarket leg and take the whole directional risk they've neutralized. This is rare but real, especially on election and macro events.",
-          "Other risks: wallets that use multiple addresses (the 'sharp' one is a decoy), sudden style drift (a wallet that nailed political markets moves to sports and stops having edge), and execution delay (by the time you copy, the information that drove the trade is already in the price). Diversify across at least five wallets to dampen wallet-specific risk.",
-        ],
-      },
-      {
-        h2: "Running a Multi-Wallet Portfolio with Polykit",
-        paras: [
-          "Our Wallet Tracker lets you favorite a watchlist, set real-time alerts on new positions, and group trades by conviction. The output is a single feed that shows, at a glance, what the sharpest money is doing across the platform — plus a layer of Analyzer reasoning on top of each of their picks so you're not copying blind.",
-          "The workflow that wins: favorite 10–15 wallets across categories, react to new positions within an hour, verify each via the Analyzer, and size at quarter-Kelly with a 2% per-market cap. That's a repeatable edge that doesn't require you to have original political or macro opinions — only to recognize skill when it shows up on-chain.",
-        ],
-      },
-    ],
-  },
-  {
-    slug: "paper-trading-strategy",
-    title: "Why Paper Trading Beats Theory",
-    desc: "Learn the market without risking a dollar of real capital — and when to make the jump to live money.",
-    date: "Feb 2, 2025",
-    read: "4 min read",
-    keywords: [
-      "paper trading prediction markets",
-      "Polymarket paper trading",
-      "practice trading",
-      "virtual trading",
-      "Polykit paper trading",
-      "learn prediction markets",
-      "risk free trading practice",
-    ],
-    body: [
-      {
-        h2: "Why Theory Alone Fails in Live Markets",
-        paras: [
-          "Reading about prediction markets teaches you the mechanics — YES/NO, orderbooks, resolution — but it teaches you nothing about how it feels to watch a 65¢ contract drop to 48¢ overnight because of a news cycle. The emotional texture of trading is where most accounts get blown up, and no amount of theory prepares you for it.",
-          "Paper trading closes the gap. You make real decisions, watch real prices move, and experience real PnL swings — all with play money. The lessons stick because your brain processes the outcomes as real, even though your wallet doesn't.",
-        ],
-      },
-      {
-        h2: "What Paper Trading Actually Trains",
-        paras: [
-          "Three specific skills. First, discipline — sticking to a sizing rule when you're 'sure' about a market. Second, sizing calibration — getting a feel for what 2% of bankroll actually looks like across dozens of positions. Third, pattern recognition — learning which setups (news-driven mispricings, thin-liquidity overreactions, correlated pair trades) tend to resolve in your favor over time.",
-          "Notice what's not on that list: predicting the future. Paper trading doesn't make you better at knowing who wins an election. It makes you better at converting a given edge into a profitable position.",
-        ],
-      },
-      {
-        h2: "How Polykit's Paper Trading Works",
-        paras: [
-          "Every Polykit account starts with $100,000 in virtual USDC. You can place YES or NO positions on any real Polymarket or Kalshi contract at the live market price, hold to resolution or sell early, and track share-based PnL exactly the way a real account would. Trades settle against real-world outcomes, so your virtual portfolio performance mirrors what you would have earned for real.",
-          "The key is that everything is real except the money. Prices are live. News is live. Resolutions are real. This is not a simulator with synthetic markets — it's the actual platform, wired to a virtual balance.",
-        ],
-      },
-      {
-        h2: "Setting Rules Before You Trade",
-        paras: [
-          "Write down three rules before your first paper trade and do not deviate. One: maximum stake per market (we suggest 3% of bankroll). Two: maximum number of simultaneous positions (start at 10). Three: a written thesis for every trade, one sentence minimum. Store them in a notes app, a spreadsheet, anywhere you'll actually see them.",
-          "These rules exist to make your paper trading data usable. Without them, you'll take one oversized bet that dominates your PnL, and you'll learn nothing about whether your actual selection process has edge.",
-        ],
-      },
-      {
-        h2: "Reviewing Weekly",
-        paras: [
-          "At the end of each week, pull your trade log and ask four questions: which categories made money, which lost, what was my average edge on entry, and did I follow my sizing rules. If you didn't follow your rules, the PnL is uninterpretable and you need another week. If you did, the data tells you where your real skill lives.",
-          "Most traders find they're great in one or two categories (say, politics and sports) and terrible in one or two others (say, crypto or weather). Specializing is dramatically more profitable than trying to have an opinion on everything.",
-        ],
-      },
-      {
-        h2: "When to Switch to Real Money",
-        paras: [
-          "Three gates. One: you've paper traded for at least three weeks across at least 40 closed positions. Two: your post-fee virtual PnL is positive over that window. Three: you followed your sizing rules on every trade. If all three are true, switch to real capital at one-quarter your paper bankroll — so if you traded $100k on paper, start with $25k (or whatever fraction you can afford) live.",
-          "If any gate fails, keep paper trading. The opportunity cost of another week of virtual practice is zero. The cost of going live too early is real dollars, a blown account, and — worse — the wrong lesson about whether prediction markets are for you.",
+          "Watch the last three months of a cycle closely before taking large positions. The pattern of news-driven price swings, debate overreactions, and late-cycle polling shifts is learnable — but only by watching it play out. Running markets through the Analyzer as they move is a cheap way to check your read against a second opinion.",
         ],
       },
     ],
@@ -405,7 +285,7 @@ export const POSTS: Post[] = [
   {
     slug: "risk-scoring",
     title: "Risk Scoring: The Hidden Leverage",
-    desc: "How our risk engine flags tail-risk before you commit — Kelly, liquidity, correlation, and resolution traps.",
+    desc: "How to weigh tail-risk before you commit — Kelly, liquidity, correlation, and resolution traps.",
     date: "Feb 9, 2025",
     read: "6 min read",
     keywords: [
@@ -437,7 +317,7 @@ export const POSTS: Post[] = [
         h2: "Liquidity Risk in Thin Markets",
         paras: [
           "A contract with $5,000 of 24-hour volume and a $200 order book depth looks tradeable until you try to exit. On that size of market, a $500 sell order can move price 3–5¢ against you — a real 5–10% hit to your PnL that never shows up on the headline quote.",
-          "Polykit's risk engine scores liquidity on a 0–100 scale based on volume, depth, and time-to-resolution. Below 40, we warn explicitly. Below 20, we recommend not taking the trade unless you're planning to hold all the way to resolution, since exit will be expensive.",
+          "Check volume and book depth before you size in: a market with thin liquidity is expensive to exit, so treat it as hold-to-resolution or skip it. When the Analyzer sees an edge too small to be worth thin liquidity, it returns PASS rather than a recommendation — the absence of a call is itself information.",
         ],
       },
       {
@@ -451,7 +331,7 @@ export const POSTS: Post[] = [
         h2: "Resolution Risk and Arbitration",
         paras: [
           "Every prediction market must eventually resolve, and resolution isn't always clean. Polymarket uses UMA's optimistic oracle, which occasionally produces contested outcomes on ambiguous markets. Kalshi has more rigid resolution rules but its sports and macro markets still rely on specific data sources that can be delayed or revised.",
-          "The risk engine reads the market title and deadline against known resolution patterns and flags high-ambiguity contracts — things like 'Will X happen by Y' without a crisp data source, or multi-condition markets where only one leg is clearly verifiable. Avoid these or size them half as big as normal.",
+          "Read the market title and deadline carefully for ambiguity — things like 'Will X happen by Y' without a crisp data source, or multi-condition markets where only one leg is clearly verifiable. The Analyzer returns key risks alongside every call, and resolution ambiguity is one of the things it is asked to surface. Avoid these contracts or size them half as big as normal.",
         ],
       },
       {
@@ -532,102 +412,7 @@ export const POSTS: Post[] = [
         h2: "How Polykit Helps in Sports",
         paras: [
           "The Analyzer ingests a Kalshi or Polymarket sports screenshot, pulls live injury reports and line-movement data from sportsbook aggregators, and returns a fair-value estimate plus a written thesis. For game markets, we explicitly compare the prediction-market price to sportsbook implied probability and flag gaps larger than 2¢.",
-          "Our Paper Trading mode includes all live sports markets, so you can practice sizing and timing on game windows without risking capital. Given how chaotic sports markets can be in the hour before kickoff, this is where most users find paper trading most valuable.",
-        ],
-      },
-    ],
-  },
-  {
-    slug: "top-10-wins",
-    title: "The 10 Biggest Polykit Wins of the Year",
-    desc: "From $340 to $14,200 — real user outcomes and exactly how Polykit's Analyzer or Wallet Tracker surfaced each one.",
-    date: "Mar 1, 2025",
-    read: "9 min read",
-    keywords: [
-      "Polykit wins",
-      "prediction market case studies",
-      "Polymarket profit stories",
-      "Kalshi winning trades",
-      "user results",
-      "prediction market ROI",
-      "AI trading wins",
-    ],
-    body: [
-      {
-        h2: "Win #10 — The $340 Warm-Up (NFL Week 14 Upset)",
-        paras: [
-          "A new user paper-traded for three weeks, then went live with a $200 bankroll. Their first real win: a Week 14 NFL market where the Analyzer flagged a 6-point gap between Kalshi's 44¢ implied probability for a road underdog and the sharp closing line on DraftKings that implied 51%. Position size: $180 on YES.",
-          "The underdog won outright. Payout: $409. Net win: $229 on the trade, with a running paper-to-live transition profit of roughly $340 across the weekend. Small, unsexy, exactly the kind of trade a disciplined trader takes every week.",
-        ],
-      },
-      {
-        h2: "Win #9 — $610 on a Fed Decision (Kalshi Macro)",
-        paras: [
-          "Polykit's Analyzer flagged a Kalshi 'Fed cuts 25bps in March' contract trading at 71¢ when the Analyzer's fair value came back at 82¢. Reason: Perplexity Sonar surfaced a fresh Fed governor speech that had landed 90 minutes earlier but hadn't yet moved the market.",
-          "User took a $500 YES position, held until the FOMC announcement, and resolved for $703 profit — a clean 41% return in four days on a macro market where the edge came entirely from faster news ingestion.",
-        ],
-      },
-      {
-        h2: "Win #8 — $875 Copy Trade on a Sharp Wallet",
-        paras: [
-          "A Wallet Tracker user had favorited a 94th-percentile Polymarket wallet that specialized in obscure political primaries. The wallet entered a Senate primary YES at 29¢. The user copied within 40 minutes at 31¢, sized at 2% of bankroll ($600 position), and let it ride.",
-          "The market resolved YES two weeks later. Payout: $1,935. Net profit: $1,335 on the position, with roughly $875 attributable to the specific Analyzer-verified copy-trade thesis that aligned with the sharp wallet's entry.",
-        ],
-      },
-      {
-        h2: "Win #7 — $1,220 Soccer Live Market",
-        paras: [
-          "During a Champions League quarterfinal, the favorite went down a goal at minute 20 and Polymarket YES dropped from 68¢ to 41¢ — a classic overreaction. The Analyzer, reading a mid-game screenshot, returned fair value of 54¢ based on historical rates of favorites winning from a one-goal deficit plus in-game xG trends.",
-          "User bought $1,800 of YES at 42¢. Favorite equalized at minute 51 and won 2–1. Contract resolved at $1.00. Net profit: $2,486, with an attributed Analyzer-edge contribution of roughly $1,220 versus a naive market-price entry.",
-        ],
-      },
-      {
-        h2: "Win #6 — $1,640 on a CPI Print (Kalshi)",
-        paras: [
-          "The Analyzer flagged a 'CPI YoY < 3.0%' contract at 38¢ with fair value 51¢ based on three days of pre-release signals: used car prices, shelter index forward indicators, and a consensus of economist tweets surfaced via Sonar. User took $1,500 position.",
-          "CPI printed below 3.0%. Contract resolved YES at $1.00, payout $3,947, net profit $2,447. Attributing the AI's news-pipeline edge (versus the user's own pre-research view): roughly $1,640. A reminder that macro is one of the Analyzer's strongest categories because the signals are public but scattered.",
-        ],
-      },
-      {
-        h2: "Win #5 — $2,080 Congressional Fundraising Play",
-        paras: [
-          "An FEC quarterly filing hit the database at 2pm ET, showing a challenger with a 4-to-1 cash advantage in a competitive House district. Market stayed at 39¢ for 90 minutes before the Analyzer picked it up and returned 54¢ fair value with a specific citation to the filing.",
-          "User bought $2,100 YES at 40¢. Market drifted to 52¢ over the next week. User exited at 55¢ for a net profit of $786, plus rode a smaller remainder position through resolution. Total attributed win: $2,080 across the two-legged trade structure.",
-        ],
-      },
-      {
-        h2: "Win #4 — $3,450 on an NBA Futures Reprice",
-        paras: [
-          "A star player returned from injury mid-January and the Kalshi 'Team X makes conference finals' futures lagged at 22¢ for four days before repricing. Analyzer flagged the gap as soon as the return was confirmed by the official injury report, projecting fair value at 34¢ using historical post-injury team performance baselines.",
-          "User went $2,800 on YES. Position appreciated to 36¢ over three weeks as the team went on a 9–2 run. User exited early, banking $3,450 in profit without waiting for resolution — a textbook case of trading the repricing, not the event.",
-        ],
-      },
-      {
-        h2: "Win #3 — $5,700 Election Night Trade",
-        paras: [
-          "During a major election night, a swing-state YES contract dropped from 64¢ to 51¢ on early rural returns that historically skew one direction but reverse as urban counties report. The Analyzer, cross-referencing historical county-level reporting patterns, flagged the drop as a textbook overreaction and returned fair value of 67¢.",
-          "User deployed $4,500 at an average price of 53¢. Contract resolved YES. Total net profit on the single trade: $5,700. The hardest part wasn't the analysis — it was the discipline to click buy when the price was still dropping.",
-        ],
-      },
-      {
-        h2: "Win #2 — $9,100 Multi-Market Arbitrage",
-        paras: [
-          "The Analyzer's multi-market view detected that a presidential candidate's nomination-YES price was trading higher than the sum of their state-primary-YES contracts required to win the nomination. Pure arbitrage. User executed the spread trade: buy the sub-markets, sell the aggregate.",
-          "Over six weeks the spread closed as the individual state markets repriced. Net profit on the arbitrage leg alone: $9,100, with minimal directional risk because the trade was structurally long one side and short the other. Arbs this size are rare — but they exist, and they're what systematic screening catches.",
-        ],
-      },
-      {
-        h2: "Win #1 — $14,200 Longshot That Wasn't",
-        paras: [
-          "A longshot political primary candidate was trading at 8¢ YES across Polymarket while four separate sharp wallets (surfaced by our Wallet Tracker) had quietly accumulated positions. The Analyzer returned fair value of 17¢ based on polling momentum plus the wallet-flow signal.",
-          "User sized carefully — $1,600 at 8¢ average, explicitly treating it as a high-variance bet — and let it ride for two months. The candidate outperformed expectations and the contract resolved YES. Payout: $20,000 on an $1,600 stake. Net profit: $14,200. The winning move wasn't the prediction — it was listening to on-chain sharp money when the price disagreed.",
-        ],
-      },
-      {
-        h2: "The Pattern Across All Ten",
-        paras: [
-          "Every win traces back to one of three ingredients: faster news ingestion (the Analyzer's Sonar pipeline), on-chain sharp-money detection (the Wallet Tracker), or disciplined sizing on edges the math already confirmed. None required a crystal ball. All required a workflow that turns information into action within minutes instead of hours.",
-          "That's the product. These users aren't psychics — they're traders running a repeatable loop on better tools than the rest of the market has. The $39/month subscription paid for itself inside a week for eight of the ten. For the remaining two, it paid for the next decade.",
+          "Polykit analyzes live sports markets the same way it handles any other contract, so you can sanity-check a price during a game window before you size in. Given how chaotic sports markets get in the hour before kickoff, a fast second opinion is worth more here than almost anywhere else.",
         ],
       },
     ],

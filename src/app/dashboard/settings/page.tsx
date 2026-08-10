@@ -7,11 +7,11 @@ import { analytics } from "@/lib/analytics";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div style={{ marginBottom: 28 }}>
-      <div style={{ fontSize: 11, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.06em", color: "rgb(107,114,128)", marginBottom: 10 }}>
+    <div className="mb-7">
+      <div className="mb-2.5 text-[11px] font-semibold uppercase tracking-[0.06em] text-[#a3a3a3]">
         {title}
       </div>
-      <div style={{ borderRadius: 16, border: "1px solid rgb(229,231,235)", overflow: "hidden", backgroundColor: "rgb(255,255,255)" }}>
+      <div className="overflow-hidden rounded-2xl border border-[#e3e3e3] bg-white shadow-[0_8px_30px_rgba(0,0,0,0.04)]">
         {children}
       </div>
     </div>
@@ -37,32 +37,38 @@ function Row({
     <button
       onClick={onClick}
       disabled={!onClick}
-      style={{
-        width: "100%",
-        display: "flex",
-        alignItems: "center",
-        gap: 14,
-        padding: "14px 18px",
-        borderBottom: "1px solid rgb(243,244,246)",
-        background: "transparent",
-        cursor: onClick ? "pointer" : "default",
-        textAlign: "left",
-        fontFamily: "inherit",
-      }}
-      className="hover:bg-gray-50 transition-colors last:border-b-0"
+      className="flex w-full items-center gap-3.5 border-b border-[#f0f0f0] px-[18px] py-3.5 text-left transition-colors last:border-b-0 hover:bg-[#f7f7f7] disabled:cursor-default disabled:hover:bg-transparent"
     >
-      <div style={{
-        width: 34, height: 34, borderRadius: 9, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center",
-        backgroundColor: danger ? "rgba(239,68,68,0.08)" : "rgba(36,99,235,0.07)",
-      }}>
-        <Icon size={16} style={{ color: danger ? "rgb(220,38,38)" : "rgb(36,99,235)" }} />
+      <div
+        className={`flex h-[34px] w-[34px] shrink-0 items-center justify-center rounded-[9px] ${
+          danger
+            ? "bg-red-50 text-red-600"
+            : "bg-gradient-to-br from-[#0080ff]/15 to-[#5f61ed]/15 text-[#006fff]"
+        }`}
+      >
+        <Icon size={16} />
       </div>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontSize: 14, fontWeight: 500, color: danger ? "rgb(220,38,38)" : "rgb(20,24,31)" }}>{label}</div>
-        {value && <div style={{ fontSize: 12, color: "rgb(107,114,128)", marginTop: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{value}</div>}
+      <div className="min-w-0 flex-1">
+        <div
+          className={`text-[14px] font-medium ${danger ? "text-red-600" : "text-[#0d0d0d]"}`}
+        >
+          {label}
+        </div>
+        {value && (
+          <div className="mt-0.5 truncate text-[12px] text-[#737373]">{value}</div>
+        )}
       </div>
       {chevron && onClick && (
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgb(156,163,175)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#a3a3a3"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
           <polyline points="9 18 15 12 9 6" />
         </svg>
       )}
@@ -75,14 +81,13 @@ export default function SettingsPage() {
   const { user } = useUser();
   const { openUserProfile } = useClerk();
   const [billingLoading, setBillingLoading] = useState(false);
-  const [manageUrl, setManageUrl] = useState<string>("https://whop.com/@me/settings/orders/");
+  const [manageUrl, setManageUrl] = useState<string>(
+    "https://whop.com/@me/settings/orders/",
+  );
 
-  const email = user?.primaryEmailAddress?.emailAddress ?? "—";
-  const name = user?.fullName ?? user?.firstName ?? "—";
+  const email = user?.primaryEmailAddress?.emailAddress ?? "–";
+  const name = user?.fullName ?? user?.firstName ?? "–";
 
-  // Fetch the user-specific Whop manage URL (mber_<id>) once we know they
-  // have access. Falls back to the generic billing portal until the webhook
-  // stamps a specific URL on the row.
   useEffect(() => {
     if (!hasAccess) return;
     let cancelled = false;
@@ -91,42 +96,27 @@ export default function SettingsPage() {
       .then((data: { url?: string } | null) => {
         if (!cancelled && data?.url) setManageUrl(data.url);
       })
-      .catch(() => {
-        /* keep fallback */
-      });
+      .catch(() => {});
     return () => {
       cancelled = true;
     };
   }, [hasAccess]);
 
-  async function openBillingPortal() {
-    try {
-      setBillingLoading(true);
-      const res = await fetch("/api/stripe/portal", { method: "POST" });
-      const data = (await res.json()) as { url?: string };
-      if (data?.url) window.location.href = data.url;
-    } finally {
-      setBillingLoading(false);
-    }
-  }
-
   return (
-    <div style={{ padding: "0 32px 48px", maxWidth: 520, margin: "0 auto" }}>
-      <div style={{ height: 52, paddingTop: 12, marginBottom: 28 }}>
-        <h1 style={{ fontSize: 20, fontWeight: 600, color: "rgb(20,24,31)", margin: 0 }}>Settings</h1>
-      </div>
-
-      {/* Account */}
+    <div className="mx-auto max-w-[520px] px-6 py-8 md:px-8 md:py-10">
       <Section title="Account">
         <Row icon={User} label={name} value={email} onClick={() => openUserProfile()} />
       </Section>
 
-      {/* Subscription */}
       <Section title="Subscription">
         <Row
           icon={CreditCard}
-          label={hasAccess ? "Polykit All Access — Active" : "Upgrade to Pro"}
-          value={hasAccess ? "$1 first month, then $39/mo" : "$1 first month — then $39/mo"}
+          label={hasAccess ? "Polykit MCP · Active" : "Upgrade to MCP access"}
+          value={
+            hasAccess
+              ? "$14/mo · first month $1"
+              : "$14/mo · first month $1"
+          }
           chevron={false}
         />
         {hasAccess && (
@@ -140,7 +130,7 @@ export default function SettingsPage() {
             <Row
               icon={LogOut}
               label="Cancel Subscription"
-              value="Cancel anytime — no hassle"
+              value="Cancel anytime, no hassle"
               onClick={() => window.open(manageUrl, "_blank")}
               danger
               chevron={false}
@@ -148,55 +138,82 @@ export default function SettingsPage() {
           </>
         )}
         {!hasAccess && (
-          <div style={{ padding: "0 18px 14px" }}>
+          <div className="px-[18px] pb-3.5">
             <button
               onClick={async () => {
                 analytics.checkoutStarted("settings");
-                if (typeof window !== "undefined") localStorage.setItem("ps_checkout_started", "1");
-                const res = await fetch("/api/stripe/checkout", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ cancelPath: "/dashboard/settings" }),
-                });
-                const data = (await res.json()) as { url?: string };
-                if (data?.url) window.location.href = data.url;
+                if (typeof window !== "undefined")
+                  localStorage.setItem("ps_checkout_started", "1");
+                setBillingLoading(true);
+                try {
+                  const res = await fetch("/api/stripe/checkout", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ cancelPath: "/dashboard/settings" }),
+                  });
+                  const data = (await res.json()) as { url?: string };
+                  if (data?.url) window.location.href = data.url;
+                } finally {
+                  setBillingLoading(false);
+                }
               }}
-              className="btn-primary btn-primary-sm w-full mt-1"
-              style={{ width: "100%" }}
+              className="btn-primary btn-primary-sm mt-1 w-full"
+              disabled={billingLoading}
             >
-              Start for $1 →
+              {billingLoading ? "Redirecting…" : "Connect for $1 →"}
             </button>
           </div>
         )}
       </Section>
 
-      {/* Notifications */}
       <Section title="Notifications">
-        <Row icon={Bell} label="Email notifications" value="Managed via your email provider" chevron={false} />
+        <Row
+          icon={Bell}
+          label="Email notifications"
+          value="Managed via your email provider"
+          chevron={false}
+        />
       </Section>
 
-      {/* Security */}
       <Section title="Security">
-        <Row icon={Shield} label="Password & Security" value="Manage via your account profile" onClick={() => openUserProfile()} />
+        <Row
+          icon={Shield}
+          label="Password & Security"
+          value="Manage via your account profile"
+          onClick={() => openUserProfile()}
+        />
       </Section>
 
-      {/* Support */}
       <Section title="Support">
         <Row
           icon={Mail}
           label="Contact Support"
           value="hello@hilo.media"
-          onClick={() => { window.location.href = "mailto:hello@hilo.media"; }}
+          onClick={() => {
+            window.location.href = "mailto:hello@hilo.media";
+          }}
         />
       </Section>
 
-      {/* Danger */}
       <Section title="Danger Zone">
-        <Row icon={LogOut} label={billingLoading ? "Redirecting…" : "Sign Out"} onClick={signOut} danger chevron={false} />
+        <Row
+          icon={LogOut}
+          label={billingLoading ? "Redirecting…" : "Sign Out"}
+          onClick={signOut}
+          danger
+          chevron={false}
+        />
       </Section>
 
-      <p style={{ fontSize: 11, color: "rgb(156,163,175)", textAlign: "center", marginTop: 32 }}>
-        Polykit by Hilo LLC · <a href="/terms" style={{ color: "rgb(156,163,175)" }}>Terms</a> · <a href="/privacy" style={{ color: "rgb(156,163,175)" }}>Privacy</a>
+      <p className="mt-8 text-center text-[11px] text-[#a3a3a3]">
+        Polykit by Hilo LLC ·{" "}
+        <a href="/terms" className="hover:text-[#737373]">
+          Terms
+        </a>{" "}
+        ·{" "}
+        <a href="/privacy" className="hover:text-[#737373]">
+          Privacy
+        </a>
       </p>
     </div>
   );

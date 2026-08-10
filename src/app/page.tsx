@@ -1,90 +1,96 @@
 import type { Metadata } from "next";
-import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
+import { Instrument_Sans } from "next/font/google";
 import { Nav } from "@/components/layout/Nav";
 import { Footer } from "@/components/layout/Footer";
 import { Hero } from "@/components/home/Hero";
-import { ThreeStep } from "@/components/home/ThreeStep";
-import { TrustCTA } from "@/components/home/TrustCTA";
-import { FeatureCards } from "@/components/home/FeatureCards";
-import { SocialProofGallery } from "@/components/home/SocialProofGallery";
+import { McpFeatures } from "@/components/home/McpFeatures";
+import { HowItWorks } from "@/components/home/HowItWorks";
 import { PricingCard } from "@/components/home/PricingCard";
-import { ProfitCalculator } from "@/components/home/ProfitCalculator";
 import { FAQ } from "@/components/home/FAQ";
-import { UrgencyBanner } from "@/components/home/UrgencyBanner";
+
+const instrument = Instrument_Sans({
+  subsets: ["latin"],
+  variable: "--font-display",
+  display: "swap",
+});
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://polykit.co";
 
 export const metadata: Metadata = {
-  title: "Polykit — AI Companion for Polymarket & Kalshi Prediction Markets",
+  title: "Polykit — Polymarket MCP for ChatGPT & Claude",
   description:
-    "Screenshot any Polymarket or Kalshi market and get an instant AI edge analysis. Paper trade risk-free, track sharp wallets, and surface mispriced bets in seconds.",
+    "Connect Polykit as a custom MCP. ChatGPT and Claude analyze any Polymarket market for fair value, edge, and BUY/SELL/PASS recommendations.",
   keywords: [
-    "Polymarket",
-    "Kalshi",
-    "prediction markets",
-    "AI prediction market tool",
-    "Polymarket AI analyzer",
-    "Kalshi AI analyzer",
-    "prediction market edge",
-    "Polymarket wallet tracker",
-    "paper trading prediction markets",
-    "smart money Polymarket",
+    "Polymarket MCP",
+    "ChatGPT Polymarket",
+    "Claude Polymarket",
+    "ChatGPT MCP",
+    "Claude MCP",
+    "prediction market AI",
+    "Polymarket analysis",
+    "Polykit",
   ],
   openGraph: {
     type: "website",
     url: SITE_URL,
     siteName: "Polykit",
-    title: "Polykit — AI Companion for Polymarket & Kalshi",
+    title: "Polykit — Polymarket MCP for ChatGPT & Claude",
     description:
-      "Screenshot any Polymarket or Kalshi market and get an instant AI edge analysis, paper-trade it, and track sharp wallets.",
+      "Headless MCP for Polymarket analysis. Fair value, edge, and clear recommendations inside ChatGPT and Claude.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Polykit — AI for Polymarket & Kalshi",
-    description:
-      "Instant AI edge analysis on every Polymarket and Kalshi market. Paper trade, copy sharp wallets, find mispriced bets.",
+    title: "Polykit — Polymarket MCP for ChatGPT & Claude",
+    description: "Connect Polykit as a custom MCP and analyze any Polymarket market.",
   },
   alternates: { canonical: SITE_URL },
 };
 
-const softwareJsonLd = {
-  "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  name: "Polykit",
-  applicationCategory: "FinanceApplication",
-  description:
-    "AI-powered prediction market analyzer for Polymarket and Kalshi",
-  url: SITE_URL,
-  offers: {
-    "@type": "Offer",
-    price: "39",
-    priceCurrency: "USD",
-  },
-  operatingSystem: "Web",
-};
-
 export default function Home() {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        name: "Polykit",
+        url: SITE_URL,
+        description:
+          "Headless MCP server for Polymarket analysis inside ChatGPT and Claude.",
+      },
+      {
+        "@type": "SoftwareApplication",
+        name: "Polykit",
+        applicationCategory: "BusinessApplication",
+        operatingSystem: "Web",
+        url: SITE_URL,
+        description:
+          "Polymarket MCP for ChatGPT and Claude. Fair value, edge, and BUY/SELL/PASS recommendations.",
+        offers: {
+          "@type": "Offer",
+          price: "14.00",
+          priceCurrency: "USD",
+          description: "$14/month, cancel anytime. First month $1.",
+          url: `${SITE_URL}/pricing`,
+        },
+      },
+    ],
+  };
+
   return (
-    <>
+    <div className={`${instrument.variable} font-sans`}>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareJsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <AnnouncementBar />
-      <Nav transparent />
-      <main className="-mt-16">
+      <Nav />
+      <main>
         <Hero />
-        <ThreeStep />
-        <TrustCTA />
-        <FeatureCards />
-        <SocialProofGallery />
-        <TrustCTA />
-        <div className="pt-4"><UrgencyBanner /></div>
+        <McpFeatures />
+        <HowItWorks />
         <PricingCard />
-        <ProfitCalculator />
         <FAQ />
       </main>
       <Footer />
-    </>
+    </div>
   );
 }

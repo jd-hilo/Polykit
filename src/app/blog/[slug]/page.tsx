@@ -144,7 +144,7 @@ export default async function Article({
         <div className="mt-14 rounded-3xl bg-primary p-8 text-center text-white">
           <div className="text-2xl font-extrabold">Ready to try it?</div>
           <Link href="/dashboard" className="btn-white mt-5">
-            Try it for $39 <ArrowRight size={14} />
+            Try it for $14 <ArrowRight size={14} />
           </Link>
           <p className="mt-4 text-xs opacity-80">
             Trusted by traders analyzing 1000+ markets weekly

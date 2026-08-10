@@ -3,45 +3,58 @@ import { NextResponse } from "next/server";
 
 const isProtectedRoute = createRouteMatcher(["/dashboard(.*)"]);
 
-// Coming-soon mode: the teaser at / is the only page anyone (authed or not)
-// can see. Flip off by removing COMING_SOON=1 from the environment.
-const COMING_SOON = process.env.COMING_SOON === "1";
+// MCP uses Bearer credentials — never Clerk cookie auth. The OAuth token and
+// registration endpoints are machine-to-machine for the same reason: the client
+// calls them without a browser session.
+const isMcpRoute = createRouteMatcher([
+  "/api/mcp",
+  "/api/sse",
+  "/api/message",
+  "/api/oauth/(.*)",
+]);
 
-const isAllowedInComingSoon = createRouteMatcher([
-  "/coming-soon", // rewrite target — must be allowlisted or / loops
+// Teaser gate. Set COMING_SOON=1 to send visitors to /coming-soon instead of
+// the marketing site. Unset (or any other value) serves the live product.
+const comingSoon = process.env.COMING_SOON === "1";
+
+// Stays reachable while the teaser is up: paying members keep their dashboard
+// and connection keys, Whop billing webhooks keep firing, and the links in the
+// teaser footer still resolve.
+const bypassesTeaser = createRouteMatcher([
+  "/coming-soon",
+  "/api/(.*)",
+  "/dashboard(.*)",
+  "/sign-in(.*)",
+  "/sign-up(.*)",
+  // Connector authorization must survive the teaser: a member connecting from
+  // claude.ai lands here mid-OAuth-redirect.
+  "/oauth/(.*)",
   "/contact",
   "/privacy",
   "/terms",
+  // Crawler + agent files must always serve their real contents — a redirect
+  // here means crawlers lose our directives entirely.
   "/robots.txt",
   "/sitemap.xml",
-  "/api/launch-waitlist",
-  "/api/webhooks(.*)", // Whop webhook must stay reachable
-  "/api/stripe/webhook",
-  "/api/subscription/status", // AuthProvider polls this; a 503 pops paywall modals
-  "/ingest(.*)", // PostHog capture proxy (next.config rewrites run after middleware)
+  "/llms.txt",
+  "/llms-full.txt",
+  // MCP clients probe these during auth discovery; never send them to the teaser.
+  "/.well-known/(.*)",
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
   const { pathname } = req.nextUrl;
 
-  if (COMING_SOON) {
-    if (pathname === "/") {
-      return NextResponse.rewrite(new URL("/coming-soon", req.url));
+  if (comingSoon) {
+    if (!bypassesTeaser(req)) {
+      return NextResponse.redirect(new URL("/coming-soon", req.url), 307);
     }
-    if (isAllowedInComingSoon(req)) return;
-    if (pathname.startsWith("/api")) {
-      return NextResponse.json(
-        { error: "Temporarily unavailable" },
-        { status: 503 },
-      );
-    }
+  } else if (pathname === "/coming-soon") {
+    // Teaser off — send stragglers to the live MCP landing.
     return NextResponse.redirect(new URL("/", req.url), 307);
   }
 
-  // Flag off: keep / canonical — the teaser has no reason to be visited directly.
-  if (pathname === "/coming-soon") {
-    return NextResponse.redirect(new URL("/", req.url), 307);
-  }
+  if (isMcpRoute(req)) return;
 
   if (isProtectedRoute(req)) {
     await auth.protect();
@@ -50,9 +63,7 @@ export default clerkMiddleware(async (auth, req) => {
 
 export const config = {
   matcher: [
-    // Skip Next internals and all static files, unless found in search params.
     "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
-    // Always run for API routes.
     "/(api|trpc)(.*)",
   ],
 };

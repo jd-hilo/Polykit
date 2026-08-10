@@ -104,3 +104,81 @@ model CoachMessage {
   @@index([userId, createdAt])
   @@map("coach_messages")
 }
+
+model ApiKey {
+  id         String    @id @default(uuid()) @db.Uuid
+  userId     String    @map("user_id")
+  name       String    @default("Default")
+  keyPrefix  String    @map("key_prefix")
+  keyHash    String    @unique @map("key_hash")
+  lastUsedAt DateTime? @map("last_used_at") @db.Timestamptz
+  revokedAt  DateTime? @map("revoked_at") @db.Timestamptz
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  @@index([userId])
+  @@map("api_keys")
+}
+
+model McpToolCall {
+  id           String   @id @default(uuid()) @db.Uuid
+  userId       String   @map("user_id")
+  apiKeyId     String?  @map("api_key_id") @db.Uuid
+  tool         String
+  status       String   // ok | error
+  latencyMs    Int?     @map("latency_ms")
+  inputSummary String?  @map("input_summary")
+  errorMessage String?  @map("error_message")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
+  @@index([userId, createdAt])
+  @@map("mcp_tool_calls")
+}
+
+// ─────────────────────────────────────────────────────────────
+// OAuth 2.1 authorization server — lets MCP clients that only
+// speak OAuth (Claude.ai custom connectors) sign the user in
+// through Clerk instead of pasting a connection key.
+// ─────────────────────────────────────────────────────────────
+
+model OAuthClient {
+  // Public client id we hand back from dynamic client registration.
+  clientId     String   @id @map("client_id")
+  clientName   String?  @map("client_name")
+  redirectUris String[] @map("redirect_uris")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
+  @@map("oauth_clients")
+}
+
+model OAuthCode {
+  // Authorization code, stored hashed — it is a bearer credential.
+  codeHash            String   @id @map("code_hash")
+  clientId            String   @map("client_id")
+  userId              String   @map("user_id")
+  redirectUri         String   @map("redirect_uri")
+  // PKCE. S256 only; we reject plain.
+  codeChallenge       String   @map("code_challenge")
+  codeChallengeMethod String   @default("S256") @map("code_challenge_method")
+  scope               String   @default("analyze")
+  resource            String?
+  expiresAt           DateTime @map("expires_at") @db.Timestamptz
+  consumedAt          DateTime? @map("consumed_at") @db.Timestamptz
+  createdAt           DateTime @default(now()) @map("created_at") @db.Timestamptz
+  @@index([userId])
+  @@map("oauth_codes")
+}
+
+model OAuthToken {
+  id           String    @id @default(uuid()) @db.Uuid
+  // Both access and refresh tokens are stored hashed.
+  tokenHash    String    @unique @map("token_hash")
+  // access | refresh
+  tokenType    String    @map("token_type")
+  clientId     String    @map("client_id")
+  userId       String    @map("user_id")
+  scope        String    @default("analyze")
+  expiresAt    DateTime? @map("expires_at") @db.Timestamptz
+  revokedAt    DateTime? @map("revoked_at") @db.Timestamptz
+  lastUsedAt   DateTime? @map("last_used_at") @db.Timestamptz
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  @@index([userId])
+  @@index([tokenType, expiresAt])
+  @@map("oauth_tokens")
+}

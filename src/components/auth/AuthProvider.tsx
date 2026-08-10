@@ -28,7 +28,7 @@ export const useAuth = () => {
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const { user: clerkUser, isLoaded } = useUser();
-  const { openSignIn, signOut: clerkSignOut } = useClerk();
+  const { signOut: clerkSignOut } = useClerk();
 
   const [paywallOpen, setPaywallOpen] = useState(false);
   const [returnOpen, setReturnOpen] = useState(false);
@@ -234,15 +234,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const openAuth = useCallback((location = "unknown") => {
     analytics.ctaClicked(location);
-    if (user) {
-      if (typeof window !== "undefined") window.location.href = "/dashboard";
+    if (!user) {
+      // Hard navigate — more reliable than openSignIn() modal across Clerk versions.
+      if (typeof window !== "undefined") {
+        window.location.href = "/sign-in";
+      }
       return;
     }
-    openSignIn({
-      fallbackRedirectUrl: "/dashboard",
-      signUpFallbackRedirectUrl: "/dashboard",
-    });
-  }, [openSignIn, user]);
+    if (hasAccess) {
+      if (typeof window !== "undefined") {
+        window.location.href = "/dashboard";
+      }
+      return;
+    }
+    // Signed in but not subscribed → open paywall / checkout.
+    const alreadySeen =
+      typeof window !== "undefined" && localStorage.getItem("pk_offer_seen") === "1";
+    if (alreadySeen) {
+      analytics.paywallViewed("return");
+      setReturnOpen(true);
+    } else {
+      analytics.paywallViewed("initial");
+      setPaywallOpen(true);
+    }
+  }, [user, hasAccess]);
 
   const openGate = useCallback(() => {
     const alreadySeen =

@@ -1,56 +1,38 @@
 "use client";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { useAuth } from "@/components/auth/AuthProvider";
-import { cn } from "@/lib/utils";
+import { usePathname } from "next/navigation";
+import { StartCta } from "@/components/auth/StartCta";
+import { Logo } from "@/components/layout/Logo";
 
-export function Logo({ light = false }: { light?: boolean }) {
-  return (
-    <Link href="/" className={cn("flex items-center gap-2 font-bold tracking-tight", light ? "text-white" : "text-foreground")}>
-      <img src="/logo.png" alt="Polykit" className="h-8 w-8 rounded-lg" />
-      <span className="text-lg">Polykit</span>
-    </Link>
-  );
-}
+export function Nav() {
+  const pathname = usePathname();
+  const onHome = pathname === "/";
 
-export function Nav({ transparent = false }: { transparent?: boolean }) {
-  const { openAuth } = useAuth();
-  const [scrolled, setScrolled] = useState(false);
-  useEffect(() => {
-    if (!transparent) return;
-    let raf = 0;
-    const tick = () => {
-      setScrolled(window.scrollY > 40);
-      raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [transparent]);
-  const onDark = transparent && !scrolled;
+  const links = [
+    [onHome ? "#features" : "/#features", "Features"],
+    ["/mcp", "MCP setup"],
+    [onHome ? "#pricing" : "/pricing", "Pricing"],
+    [onHome ? "#faqs" : "/#faqs", "FAQ"],
+  ] as const;
+
   return (
-    <header className={cn(
-      "sticky top-0 z-40 transition-colors",
-      onDark ? "bg-transparent" : "border-b border-border bg-white/95 backdrop-blur"
-    )}>
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
-        <Link href="/" className={cn("flex items-center gap-2 font-bold tracking-tight transition-colors", onDark ? "text-white" : "text-foreground")}>
-          <img src="/logo.png" alt="Polykit" className="h-8 w-8 rounded-lg" />
-          <span className="text-lg">Polykit</span>
-        </Link>
-        <nav className={cn("hidden items-center gap-10 text-[15px] font-medium md:flex transition-colors", onDark ? "text-white/90" : "text-foreground/80")}>
-          <a href="#features" className="hover:opacity-80 transition">Features</a>
-          <a href="#faqs" className="hover:opacity-80 transition">FAQs</a>
-          <a href="#pricing" className="hover:opacity-80 transition">Pricing</a>
-        </nav>
-        {onDark ? (
-          <button onClick={() => openAuth("nav_transparent")} className="inline-flex items-center rounded-full bg-white/10 px-5 py-2.5 text-sm font-semibold text-white ring-1 ring-white/30 backdrop-blur transition hover:bg-white/20">
-            Start for $1
-          </button>
-        ) : (
-          <button onClick={() => openAuth("nav")} className="btn-primary btn-primary-sm">
-            Start for $1
-          </button>
-        )}
+    <header className="fixed top-0 z-40 w-full px-4 pt-4 md:px-6 md:pt-5">
+      <div className="mx-auto flex max-w-5xl justify-center">
+        <div className="supaste-nav w-full max-w-3xl justify-between px-3 py-2 sm:px-4">
+          <Logo size={28} light className="[&_span]:text-[15px] [&_span]:text-white" />
+          <nav className="hidden items-center gap-1 md:flex">
+            {links.map(([href, label]) => (
+              <Link
+                key={label}
+                href={href}
+                className="rounded-full px-3 py-1.5 text-[13px] font-medium text-white/70 transition hover:bg-white/10 hover:text-white"
+              >
+                {label}
+              </Link>
+            ))}
+          </nav>
+          <StartCta location="nav" className="btn-primary btn-primary-sm" onDark />
+        </div>
       </div>
     </header>
   );

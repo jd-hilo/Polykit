@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { Modal } from "./Modal";
-import { Eye, EyeOff, Star } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 
 export function AuthModal({ open, onClose, onSuccess }: { open: boolean; onClose: () => void; onSuccess: (email: string) => void; }) {
   const [step, setStep] = useState<"start" | "password">("start");
@@ -55,11 +55,7 @@ export function AuthModal({ open, onClose, onSuccess }: { open: boolean; onClose
         </div>
       )}
 
-      <div className="mt-5 flex items-center justify-center gap-2 text-xs text-muted-foreground">
-        <div className="flex text-yellow-400">{Array.from({length:5}).map((_,i)=><Star key={i} size={12} fill="currentColor" />)}</div>
-        <span>4.9/5</span><span>•</span><span>verified by Proof</span>
-      </div>
-      <p className="mt-2 text-center text-[10px] text-muted-foreground">By continuing you agree to our Terms &amp; Privacy.</p>
+      <p className="mt-5 text-center text-[10px] text-muted-foreground">By continuing you agree to our Terms &amp; Privacy.</p>
     </Modal>
   );
 }

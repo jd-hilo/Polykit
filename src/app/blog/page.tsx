@@ -11,7 +11,7 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://polykit.co";
 export const metadata: Metadata = {
   title: "The Polykit Blog — Prediction Market Guides & AI Edge Breakdowns",
   description:
-    "Guides, breakdowns, and deep dives to sharpen your edge in prediction markets. Polymarket, Kalshi, wallet tracking, paper trading, and AI market analysis.",
+    "Guides, breakdowns, and deep dives to sharpen your edge in prediction markets. Polymarket, Kalshi, risk sizing, and AI market analysis.",
   keywords: [
     "Polymarket blog",
     "Kalshi blog",
@@ -19,8 +19,8 @@ export const metadata: Metadata = {
     "prediction market strategy",
     "Polymarket tutorials",
     "AI prediction market",
-    "Polymarket wallet tracker",
-    "paper trading prediction markets",
+    "Polymarket MCP",
+    "prediction market risk management",
   ],
   openGraph: {
     type: "website",
