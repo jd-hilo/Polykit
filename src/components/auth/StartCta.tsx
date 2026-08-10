@@ -10,12 +10,13 @@ const DEMO_LIGHT =
 const DEMO_ON_DARK =
   "inline-flex items-center rounded-full border border-white/30 bg-white/15 px-3.5 py-2 text-[13px] font-semibold text-white backdrop-blur-sm transition hover:bg-white/25";
 
-/** CTA: product-led label for prospects, "Open dashboard" when subscribed.
- *  Pass `label` to vary the wording per section. When NEXT_PUBLIC_ALL_PREM=1,
- *  also shows a Demo shortcut beside it. */
+/** CTA: one label everywhere for prospects, "Open dashboard" when subscribed.
+ *  `label` exists for the rare one-off; every site-wide CTA should inherit the
+ *  default so the button never says different things on different sections.
+ *  When NEXT_PUBLIC_ALL_PREM=1, also shows a Demo shortcut beside it. */
 export function StartCta({
   location,
-  label = "Add Polykit to Claude",
+  label = "Connect for $1",
   className = "btn-primary btn-primary-sm",
   showArrow = false,
   onDark = false,

@@ -56,7 +56,6 @@ export function PricingCard() {
 
               <StartCta
                 location="pricing"
-                label="Connect Polykit"
                 className="btn-primary btn-primary-lg mt-8 w-full"
                 showArrow
               />

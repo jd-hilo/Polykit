@@ -64,7 +64,7 @@ export function EdgeCalculator() {
             onClick={() => openAuth("edge_calculator")}
             className="btn-primary btn-primary-md mt-7 w-full"
           >
-            Connect Polykit for $14/mo <span>→</span>
+            Connect for $1 <span>→</span>
           </button>
 
           <p className="mt-4 text-center text-[11px] leading-relaxed text-[#a3a3a3]">

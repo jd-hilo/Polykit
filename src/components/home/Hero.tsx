@@ -74,7 +74,6 @@ export function Hero() {
           <div className="mt-10 flex flex-col items-center gap-3">
             <StartCta
               location="hero"
-              label="Add Polykit to Claude"
               className="btn-hero group text-[16px]"
               showArrow
               onDark

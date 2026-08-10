@@ -71,7 +71,7 @@ export function FAQ() {
                 · Instant access · Cancel anytime
               </span>
             </p>
-            <StartCta location="faq_close" label="Add Polykit to Claude" className="btn-hero shrink-0" showArrow onDark />
+            <StartCta location="faq_close" className="btn-hero shrink-0" showArrow onDark />
           </div>
         </div>
       </div>

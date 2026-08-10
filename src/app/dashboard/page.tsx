@@ -222,7 +222,7 @@ export default function DashboardHome() {
                   onClick={() => openAuth("dashboard")}
                   className="btn-primary btn-primary-md mt-4"
                 >
-                  Unlock Polykit →
+                  Connect for $1 →
                 </button>
               )}
               {step1Done && (

@@ -70,7 +70,7 @@ export function PaywallModal({ open, onClose }: { open: boolean; onClose: () => 
             disabled={loading}
             className="btn-primary btn-primary-md mt-6 w-full"
           >
-            {loading ? "Redirecting…" : "Add Polykit to Claude →"}
+            {loading ? "Redirecting…" : "Connect for $1 →"}
           </button>
 
           <div className="mt-5 flex items-center justify-center gap-5 text-[12px] text-muted-foreground">

@@ -160,7 +160,7 @@ export default function SettingsPage() {
               className="btn-primary btn-primary-sm mt-1 w-full"
               disabled={billingLoading}
             >
-              {billingLoading ? "Redirecting…" : "Get started →"}
+              {billingLoading ? "Redirecting…" : "Connect for $1 →"}
             </button>
           </div>
         )}

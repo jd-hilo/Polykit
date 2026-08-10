@@ -41,7 +41,7 @@ export function HowItWorks() {
         </div>
 
         <div className="mt-8 flex justify-center">
-          <StartCta location="setup_cta" label="Connect Polykit" className="btn-primary btn-primary-md" showArrow />
+          <StartCta location="setup_cta" className="btn-primary btn-primary-md" showArrow />
         </div>
       </div>
     </section>
