@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { StartCta } from "@/components/auth/StartCta";
+import { useAuth } from "@/components/auth/AuthProvider";
 
 /**
  * "What is an edge worth?" — same two-slider, one-number shape as the old
@@ -10,6 +10,7 @@ import { StartCta } from "@/components/auth/StartCta";
  * "winning picks per month", which is an earnings claim we can't stand behind.
  */
 export function EdgeCalculator() {
+  const { openAuth } = useAuth();
   const [edge, setEdge] = useState(4);
   const [markets, setMarkets] = useState(10);
 
@@ -18,10 +19,10 @@ export function EdgeCalculator() {
 
   return (
     <section className="mx-auto max-w-3xl text-center">
-      <h2 className="font-display text-3xl font-semibold tracking-[-0.02em] text-[#0d0d0d] md:text-4xl">
+      <h2 className="text-4xl font-extrabold tracking-tight text-[#0d0d0d] md:text-6xl">
         What is an edge worth?
       </h2>
-      <p className="mx-auto mt-3 text-[15px] text-[#737373]">
+      <p className="mx-auto mt-4 text-[15px] text-[#737373]">
         $100 stake per market · your assumptions
       </p>
 
@@ -38,17 +39,20 @@ export function EdgeCalculator() {
 
         <div className="my-8 h-px bg-[#f0f0f0]" />
 
-        <div className="flex flex-wrap items-center justify-center gap-3 text-center text-2xl font-semibold md:text-3xl">
+        <div className="flex flex-wrap items-center justify-center gap-3 text-center text-3xl font-semibold md:text-4xl">
           <span className="text-[#0d0d0d]">Expected value:</span>
           <span className="rounded-xl bg-[#dcfce7] px-4 py-1 font-bold tabular-nums text-[#166534]">
             ${ev}/mo
           </span>
-          <span className="text-[15px] font-normal text-[#737373]">vs $14/mo for Polykit</span>
         </div>
 
-        <div className="mt-8 flex justify-center">
-          <StartCta location="edge_calculator" label="Connect Polykit" className="btn-primary btn-primary-md" showArrow />
-        </div>
+        <button
+          type="button"
+          onClick={() => openAuth("edge_calculator")}
+          className="btn-primary btn-primary-md mt-8 w-full"
+        >
+          Connect Polykit for $14/mo <span>→</span>
+        </button>
 
         <p className="mt-5 text-center text-[11px] leading-relaxed text-[#a3a3a3]">
           Straight expectation math on your inputs — not a projection of results. Edges are
