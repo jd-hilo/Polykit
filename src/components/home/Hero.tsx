@@ -177,8 +177,8 @@ function SampleResult() {
         <div className="mt-6 grid grid-cols-3 gap-2.5">
           {[
             { k: "Action", v: "BUY No", accent: "text-[#16a34a]" },
-            { k: "Edge", v: "+9.4¢", accent: "text-[#006fff]" },
-            { k: "Confidence", v: "72", accent: "text-[#0d0d0d]" },
+            { k: "Edge", v: "+4¢", accent: "text-[#006fff]" },
+            { k: "Confidence", v: "Med", accent: "text-[#0d0d0d]" },
           ].map((s) => (
             <div
               key={s.k}
@@ -212,14 +212,18 @@ function SampleResult() {
 
       {/* Chat mock */}
       <div className="flex min-h-[360px] flex-col bg-[#262624]">
-        <div className="flex items-center gap-2.5 px-5 py-4">
-          <span className="text-[15px] font-medium text-[#f5f0e8]">Polykit</span>
-          <span className="ml-auto text-[11px] text-[#a8a29e]">analyze_market</span>
+        <div className="flex items-center gap-2 border-b border-white/[0.06] px-5 py-3.5">
+          <ClaudeMark size={14} />
+          <span className="text-[14px] font-medium text-[#f5f0e8]">Claude</span>
+          <span className="ml-auto inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.06] px-2.5 py-1 text-[10px] font-medium text-[#a8a29e]">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#4ade80]" />
+            Polykit connected
+          </span>
         </div>
 
-        <div className="flex flex-1 flex-col justify-center gap-6 px-5 pb-2">
+        <div className="flex flex-1 flex-col justify-center gap-5 px-5 pb-2 pt-4">
           <div className="ml-auto max-w-[88%]">
-            <div className="rounded-[18px] bg-[#30302e] px-4 py-3">
+            <div className="rounded-[18px] rounded-br-md bg-[#30302e] px-4 py-3">
               <p className="text-[13px] leading-relaxed text-[#eceae4]">
                 Analyze this and tell me if there&apos;s edge:{" "}
                 <span className="text-[#c4b5a0]">
@@ -234,15 +238,21 @@ function SampleResult() {
               <ClaudeMark size={14} />
             </div>
             <div className="min-w-0 space-y-2.5">
-              <p className="text-[11px] text-[#a8a29e]">
-                Used <span className="text-[#eceae4]">analyze_market</span>
+              <p className="inline-flex items-center gap-1.5 rounded-md border border-white/10 bg-white/[0.04] px-2 py-1 text-[11px] text-[#a8a29e]">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                <span className="font-mono">analyze_market</span> · polykit
               </p>
+              <div className="rounded-lg border border-white/[0.08] bg-white/[0.04] px-3 py-2">
+                <p className="text-[13px] font-semibold tabular-nums text-[#f5f0e8]">
+                  BUY NO · pay 91¢ · fair 95¢ · edge +4¢ · confidence medium · exit on Q3 print
+                </p>
+              </div>
               <p
-                className="text-[14px] leading-[1.65] text-[#f5f0e8]"
+                className="text-[13.5px] leading-[1.65] text-[#d6d1c7]"
                 style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}
               >
-                Buying <span className="font-medium">No at 62¢</span>. Fair value looks closer
-                to 71¢. Edge is real. Main risk is a sudden credit shock before resolution.
+                Five of the six paths to Yes are already closed by published GDP prints — the
+                only one left needs Q3 and Q4 both negative. Full working below.
               </p>
             </div>
           </div>

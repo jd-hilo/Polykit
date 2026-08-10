@@ -1,22 +1,23 @@
 "use client";
 import { StartCta } from "@/components/auth/StartCta";
+import { EdgeCalculator } from "@/components/home/EdgeCalculator";
 import { ScanSearch, Cpu, Shield } from "lucide-react";
 
 const FEATURES = [
   {
     icon: ScanSearch,
     title: "Know if a market is worth it",
-    desc: "Paste a Polymarket link or screenshot. Walk away with fair value, your edge, and a clear BUY, SELL, or PASS before you put money down.",
+    desc: "Link or screenshot in — fair value, edge, and a clear call out.",
   },
   {
     icon: Cpu,
-    title: "Find the best line on multi-outcome events",
-    desc: "Elections, candidate fields, date windows. Polykit scores every option and points you at the one with the biggest edge.",
+    title: "Best line on multi-outcome events",
+    desc: "Every option scored. The biggest edge named.",
   },
   {
     icon: Shield,
-    title: "Trade smarter without leaving chat",
-    desc: "Connect once. Ask Claude or ChatGPT. Get the analysis where you already work. No extra dashboard to babysit.",
+    title: "Never leave the chat",
+    desc: "Connect once. Ask Claude or ChatGPT anything.",
   },
 ];
 
@@ -44,14 +45,8 @@ export function McpFeatures() {
           ))}
         </div>
 
-        <div className="mt-16 max-w-2xl">
-          <h2 className="font-display text-3xl font-semibold tracking-[-0.02em] text-[#0d0d0d] md:text-4xl">
-            Stop guessing. Start seeing the edge.
-          </h2>
-          <p className="mt-3 text-[16px] leading-relaxed text-[#525252]">
-            Every Polymarket link you drop into Claude can come back with a verdict you can
-            act on, not another pile of research tabs.
-          </p>
+        <div className="mt-16">
+          <EdgeCalculator />
         </div>
 
         <div className="mt-12 grid gap-5 md:grid-cols-3">
@@ -78,11 +73,8 @@ export function McpFeatures() {
           <div aria-hidden className="supaste-banner absolute inset-0" />
           <div className="relative flex flex-wrap items-center justify-between gap-x-4 gap-y-3 px-5 py-4 md:px-6">
             <p className="text-[15px] font-semibold text-white md:text-[16px]">
-              Analyze Polymarket inside Claude and ChatGPT
-              <span className="font-normal text-white/80">
-                {" "}
-                · Unlimited analysis · Cancel anytime
-              </span>
+              Unlimited analysis
+              <span className="font-normal text-white/80"> · Cancel anytime</span>
             </p>
             <StartCta location="features_cta" label="Connect Polykit" className="btn-hero shrink-0" showArrow onDark />
           </div>
