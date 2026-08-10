@@ -15,16 +15,16 @@ export function EdgeCalculator() {
   const { openAuth } = useAuth();
   const [trades, setTrades] = useState(10);
 
-  // Stated assumption: $100 per trade at a 50% average return = $50 a trade.
+  // Stated assumption, named in the subheader: $50 a trade.
   const ev = trades * 50;
 
   return (
     <section className="mx-auto max-w-3xl">
       <h2 className="text-4xl font-extrabold tracking-tight text-[#0d0d0d] md:text-6xl">
-        What is an edge worth?
+        Run the numbers
       </h2>
       <p className="mt-3 text-[15px] text-[#737373]">
-        Say each trade is $100 and averages a 50% return
+        Say each trade averages $50
       </p>
 
       <div className="mt-10 rounded-[32px] border border-[#ececec] bg-[#f7f7f7] p-2.5 md:p-3">
@@ -68,7 +68,7 @@ export function EdgeCalculator() {
           </button>
 
           <p className="mt-4 text-center text-[11px] leading-relaxed text-[#a3a3a3]">
-            Illustrative math on the 50% assumption above — not a projection or promise of
+            Illustrative math on the $50 assumption above — not a projection or promise of
             results. Returns vary, losses happen, and most markets deserve a PASS.
           </p>
         </div>
